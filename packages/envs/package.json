@@ -1,0 +1,25 @@
+{
+  "name": "@repo/envs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node dist/index.js",
+    "build": "tsc -b",
+    "start": "pnpm run build && pnpm run dev"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*"
+  },
+  "dependencies": {
+    "@types/node": "^22.15.3",
+    "dotenv": "^16.5.0",
+    "node": "^20.19.2"
+  },
+  "exports": {
+    "./envs": "./dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

@@ -1,16 +1,156 @@
 import { Request, Response, Router } from "express";
 import { middleware } from "../middleware";
+import { prisma } from "@repo/db/db";
+import { hash, compare } from "bcryptjs";
+import { SigninTypes, SignupTypes, CreateRoomTypes } from "@repo/types/types";
+import { JwtPayload, sign } from "jsonwebtoken";
+import { JWT_SECRET } from "@repo/envs/envs";
 
 export const v1Router: Router = Router();
 
-v1Router.post("/signup", (req: Request, res: Response) => {});
+v1Router.post("/signup", async (req: Request, res: Response): Promise<any> => {
+  const result = SignupTypes.safeParse(req.body);
 
-v1Router.post("/signin", (req: Request, res: Response) => {});
+  if (!result.success && !result.data) {
+    return res.json({ message: "invalid inputs" }).status(404);
+  }
 
-v1Router.post("/signout", (req: Request, res: Response) => {});
+  const hashedPassword = await hash(result.data.password, 5);
 
-v1Router.post("/create-room", middleware, (req: Request, res: Response) => {});
+  try {
+    await prisma.user.create({
+      data: {
+        ...result.data,
+        password: hashedPassword,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .json({ message: "something went wrong while signup" })
+      .status(404);
+  }
 
-v1Router.get("/room", middleware, (req: Request, res: Response) => {});
+  return res.json({ message: "user created" }).status(201);
+});
 
-v1Router.get("/chats:roomId", middleware, (req: Request, res: Response) => {});
+v1Router.post("/signin", async (req: Request, res: Response): Promise<any> => {
+  const result = SigninTypes.safeParse(req.body);
+
+  if (!result.success && !result.data) {
+    return res.json({ message: "invalid inputs" }).status(404);
+  }
+
+  const user = await prisma.user.findFirst({
+    where: { email: result.data.email },
+  });
+
+  if (!user) {
+    return res
+      .json({ message: "user not found with the email" + result.data.email })
+      .status(401);
+  }
+
+  const isPasswordRight = await compare(result.data.password, user.password);
+
+  if (!isPasswordRight) {
+    return res.json({ message: "wrong password" }).status(401);
+  }
+
+  const token = sign({ userId: user.id }, JWT_SECRET);
+
+  return res.json({ message: "successfull", token }).status(201);
+});
+
+v1Router.post(
+  "/create-room",
+  middleware,
+  async (req: Request, res: Response): Promise<any> => {
+    const result = CreateRoomTypes.safeParse(req.body);
+    const adminId = (req as JwtPayload).userId;
+
+    if (!result.success && !result.data) {
+      return res.json({ message: "invalid inputs" }).status(404);
+    }
+
+    try {
+      const newRoom = await prisma.room.create({
+        data: {
+          ...result.data,
+          adminId,
+        },
+      });
+
+      return res
+        .json({ message: "room created", slug: newRoom.slug })
+        .status(201);
+    } catch (error) {
+      console.log(error);
+      return res
+        .json({ message: "something went wrong while creating room" })
+        .status(404);
+    }
+  }
+);
+
+v1Router.get(
+  "/room",
+  middleware,
+  async (req: Request, res: Response): Promise<any> => {
+    try {
+      const adminId = (req as JwtPayload).userId;
+      const rooms = await prisma.room.findMany({
+        where: {
+          adminId,
+        },
+      });
+
+      return res.json({ message: "rooms found", rooms }).status(201);
+    } catch (error) {
+      console.log(error);
+      return res.json({ message: "internal server error" }).status(500);
+    }
+  }
+);
+
+v1Router.get(
+  "/chats/:roomId",
+  middleware,
+  async (req: Request, res: Response): Promise<any> => {
+    try {
+      const roomId = req.params.roomId;
+
+      const chats = await prisma.chat.findMany({
+        where: {
+          roomId,
+        },
+      });
+
+      return res.json({ message: "chats found", chats }).status(201);
+    } catch (error) {
+      console.log(error);
+      return res.json({ message: "internal server error" }).status(500);
+    }
+  }
+);
+
+v1Router.get(
+  "/shapes/:roomId",
+  middleware,
+  async (req: Request, res: Response): Promise<any> => {
+    try {
+      const roomId = req.params.roomId;
+
+      const shapes = await prisma.shapes.findMany({
+        where: {
+          roomId,
+        },
+      });
+
+      return res.json({ message: "shapes found", shapes }).status(201);
+    } catch (error) {
+      console.log(error);
+      return res.json({ message: "internal server error" }).status(500);
+    }
+  }
+);

@@ -8,15 +8,26 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  email    String @unique
-  name     String
-  password String
-  chats    Chat[]
-  rooms    Room[]
+  id         String   @id @default(uuid())
+  email      String   @unique
+  name       String
+  password   String
+  isVerified Boolean  @default(false)
+  chats      Chat[]
+  rooms      Room[]
+  shapes     Shapes[]
 }
 
 model Chat {
+  id      String @id @default(uuid())
+  message String
+  userId  String
+  roomId  String
+  user    User   @relation(fields: [userId], references: [id])
+  room    Room   @relation(fields: [roomId], references: [id])
+}
+
+model Shapes {
   id      String @id @default(uuid())
   message String
   userId  String
@@ -32,5 +43,6 @@ model Room {
   adminId String @unique
   user    User   @relation(fields: [adminId], references: [id])
 
-  chats Chat[]
+  chats  Chat[]
+  shapes Shapes[]
 }
