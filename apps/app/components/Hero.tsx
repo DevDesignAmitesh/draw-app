@@ -4,12 +4,13 @@ import React, { useContext } from "react";
 import SuperBtn from "./SuperBtn";
 import Image from "next/image";
 import { ThemeContext } from "@/lib/ThemeProvider";
+import Link from "next/link";
 
 const Hero = () => {
   const { theme } = useContext(ThemeContext);
 
   return (
-    <div className="w-full py-10 pt-24 flex justify-between items-center gap-10">
+    <div className="w-full py-10 pt-16 flex justify-between items-center gap-10">
       <div className="flex flex-col justify-center items-start">
         <h1 className="text-6xl text-left capitalize font-bold text-black dark:text-white">
           Virtual whiteboard for collaborative drawing
@@ -19,8 +20,12 @@ const Hero = () => {
           intuitive interface. Just like Excalidraw, but built by you.
         </p>
         <div className="flex justify-center items-center gap-4 mt-8">
-          <SuperBtn label="get started" variant="secondary" />
-          <SuperBtn label="watch demo" variant="primary" />
+          <Link href={"/signup"}>
+            <SuperBtn label="get started" variant="secondary" />
+          </Link>
+          <Link href={"#demo"}>
+            <SuperBtn label="watch demo" variant="primary" />
+          </Link>
         </div>
       </div>
       {theme === "dark" ? (
