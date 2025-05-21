@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ThemeProvider } from "@/lib/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "Collaborating Drawing App",
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="bg-white dark:bg-[#121212]">
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

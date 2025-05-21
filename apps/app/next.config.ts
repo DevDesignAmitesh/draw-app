@@ -1,7 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        hostname: "images.refero.design",
+      },
+      {
+        hostname: "marketplace.atlassian.com",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
