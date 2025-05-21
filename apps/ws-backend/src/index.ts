@@ -49,7 +49,7 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
     if (parsedMessage.type === "join_room") {
       users.push({
         ws,
-        roomSlug: null,
+        roomSlug: parsedMessage.payload.roomSlug,
         userId,
       });
     }
@@ -60,13 +60,29 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
 
     if (parsedMessage.type === "chat") {
       const { payload } = parsedMessage;
-      await prisma.chat.create({
-        data: {
-          message: payload.message,
-          roomId: payload.roomSlug,
-          userId,
-        },
-      });
+      try {
+        const room = await prisma.room.findUnique({
+          where: {
+            slug: payload.roomSlug,
+          },
+        });
+
+        if (!room) {
+          ws.close();
+          return;
+        }
+
+        await prisma.chat.create({
+          data: {
+            message: payload.message,
+            roomId: room.id,
+            userId,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+        return;
+      }
 
       users.forEach((user) => {
         if (user.ws !== ws && user.roomSlug === payload.roomSlug) {
@@ -82,13 +98,29 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
 
     if (parsedMessage.type === "shapes") {
       const { payload } = parsedMessage;
-      await prisma.shapes.create({
-        data: {
-          message: payload.message,
-          roomId: payload.roomSlug,
-          userId,
-        },
-      });
+      try {
+        const room = await prisma.room.findUnique({
+          where: {
+            slug: payload.roomSlug,
+          },
+        });
+
+        if (!room) {
+          ws.close();
+          return;
+        }
+
+        await prisma.shapes.create({
+          data: {
+            message: payload.message,
+            roomId: room.id,
+            userId,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+        return;
+      }
 
       users.forEach((user) => {
         if (user.ws !== ws && user.roomSlug === payload.roomSlug) {

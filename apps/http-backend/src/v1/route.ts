@@ -5,6 +5,7 @@ import { hash, compare } from "bcryptjs";
 import { SigninTypes, SignupTypes, CreateRoomTypes } from "@repo/types/types";
 import { JwtPayload, sign } from "jsonwebtoken";
 import { JWT_SECRET } from "@repo/envs/envs";
+import { nanoid } from "nanoid";
 
 export const v1Router: Router = Router();
 
@@ -67,16 +68,18 @@ v1Router.post(
   middleware,
   async (req: Request, res: Response): Promise<any> => {
     const result = CreateRoomTypes.safeParse(req.body);
-    const adminId = (req as JwtPayload).userId;
+    const adminId = (req as JwtPayload).user.userId;
 
     if (!result.success && !result.data) {
       return res.json({ message: "invalid inputs" }).status(404);
     }
 
     try {
+      const slug = `${result.data.slug}-${nanoid(6)}`;
       const newRoom = await prisma.room.create({
         data: {
-          ...result.data,
+          slug,
+          name: result.data.name,
           adminId,
         },
       });
@@ -114,19 +117,24 @@ v1Router.get(
 );
 
 v1Router.get(
-  "/chats/:roomId",
+  "/chats/:slug",
   middleware,
   async (req: Request, res: Response): Promise<any> => {
     try {
-      const roomId = req.params.roomId;
+      const slug = req.params.slug;
 
-      const chats = await prisma.chat.findMany({
+      const chats = await prisma.room.findUnique({
         where: {
-          roomId,
+          slug,
+        },
+        include: {
+          chats: true,
         },
       });
 
-      return res.json({ message: "chats found", chats }).status(201);
+      return res
+        .json({ message: "chats found", chats: chats?.chats })
+        .status(201);
     } catch (error) {
       console.log(error);
       return res.json({ message: "internal server error" }).status(500);
@@ -135,19 +143,24 @@ v1Router.get(
 );
 
 v1Router.get(
-  "/shapes/:roomId",
+  "/shapes/:slug",
   middleware,
   async (req: Request, res: Response): Promise<any> => {
     try {
-      const roomId = req.params.roomId;
+      const slug = req.params.slug;
 
-      const shapes = await prisma.shapes.findMany({
+      const chats = await prisma.room.findUnique({
         where: {
-          roomId,
+          slug,
+        },
+        include: {
+          shapes: true,
         },
       });
 
-      return res.json({ message: "shapes found", shapes }).status(201);
+      return res
+        .json({ message: "chats found", shapes: chats?.shapes })
+        .status(201);
     } catch (error) {
       console.log(error);
       return res.json({ message: "internal server error" }).status(500);
