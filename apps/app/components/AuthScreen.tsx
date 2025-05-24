@@ -8,7 +8,7 @@ import Link from "next/link";
 const AuthScreen = ({ isSignin }: { isSignin?: boolean }) => {
   const headingText = isSignin ? "welcome back" : "create an account";
   const subText = isSignin
-    ? "Sign in to access your diagrams"
+    ? "Sign in to access your diagrams" 
     : "Sign up to start creating your diagrams";
   const buttonLabel = isSignin ? "Sign in" : "Sign up";
   const alternateText = isSignin
@@ -42,7 +42,7 @@ const AuthScreen = ({ isSignin }: { isSignin?: boolean }) => {
         />
         <p className="text-neutral-600 dark:text-neutral-300 capitalize text-[14px]">
           {alternateText}{" "}
-          <Link href={isSignin ? "/auth/signup" : "/auth/signin"}>
+          <Link href={isSignin ? "/signup" : "/signin"}>
             <span className="text-black hover:underline dark:text-white capitalize cursor-pointer">
               {alternateAction}
             </span>

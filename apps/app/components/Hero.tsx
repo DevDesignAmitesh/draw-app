@@ -10,7 +10,7 @@ const Hero = () => {
   const { theme } = useContext(ThemeContext);
 
   return (
-    <div className="w-full py-10 pt-16 flex justify-between items-center gap-10">
+    <div className="w-full py-10 pt-24 flex justify-between items-center gap-10">
       <div className="flex flex-col justify-center items-start">
         <h1 className="text-6xl text-left capitalize font-bold text-black dark:text-white">
           Virtual whiteboard for collaborative drawing
