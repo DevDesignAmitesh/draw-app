@@ -1,4 +1,5 @@
 import {
+  FormDataTypes,
   getDistanceToCircle,
   getDistanceToLine,
   getDistanceToSquare,
@@ -22,6 +23,10 @@ export class Draw {
   public existingShapes: Shapes[];
   public undoShapes: Shapes[];
   private toolReact: (e: selectedTools) => void;
+  public strokeWidth: number;
+  public strokeStyle: string;
+  public strokeColor: string | null;
+  public theme: string | null;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -29,6 +34,10 @@ export class Draw {
     roomSlug: string,
     setSelectedTools: React.Dispatch<React.SetStateAction<selectedTools>>
   ) {
+    this.theme = null;
+    this.strokeColor = null;
+    this.strokeWidth = 2;
+    this.strokeStyle = "solid";
     this.existingShapes = [];
     this.undoShapes = [];
     this.selectedId = null;
@@ -48,11 +57,41 @@ export class Draw {
     this.toolReact = setSelectedTools;
   }
 
-  private renderAllShapes = () => {
+  public changeTheme(theme: string) {
+    this.theme = theme;
+    this.strokeColor = this.theme === "dark" ? "#fff" : "#000";
+    this.existingShapes.forEach((shape) => {
+      if (
+        this.selectedId === null ||
+        this.existingShapes[this.selectedId] !== shape
+      ) {
+        shape.strokeColor = this.strokeColor!;
+      }
+    });
+    this.renderAllShapes();
+  }
+
+  public changeStyles(data: FormDataTypes) {
+    this.strokeColor = data.strokeColor ?? this.strokeColor;
+    this.strokeWidth = data.strokeWidth ?? this.strokeWidth;
+    this.strokeStyle = data.strokeStyle ?? this.strokeStyle;
+
+    this.existingShapes.forEach((shape, idx) => {
+      if (this.selectedId === idx) {
+        shape.strokeColor = this.strokeColor!;
+        shape.width = this.strokeWidth;
+      }
+    });
+    this.renderAllShapes();
+  }
+
+  public renderAllShapes = () => {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.existingShapes.map((item) => {
+      console.log(item);
       this.context.beginPath();
       this.context.strokeStyle = item.strokeColor;
+      this.context.lineWidth = item.width;
 
       if (item.type === "square") {
         this.drawSquare(item);
@@ -116,9 +155,9 @@ export class Draw {
         y: this.startY,
         w,
         h,
-        width: "2px",
-        strokeColor: "#fff",
+        width: this.strokeWidth,
         opacity: 100,
+        strokeColor: this.strokeColor!,
       };
       this.existingShapes.push(shape);
     }
@@ -132,9 +171,9 @@ export class Draw {
         x: this.startX,
         y: this.startY,
         r,
-        width: "2px",
-        strokeColor: "#fff",
+        width: this.strokeWidth,
         opacity: 100,
+        strokeColor: this.strokeColor!,
       };
       this.existingShapes.push(shape);
     }
@@ -146,9 +185,9 @@ export class Draw {
         y: this.startY,
         cx: this.currentX,
         cY: this.currentY,
-        width: "2px",
-        strokeColor: "#fff",
+        width: this.strokeWidth,
         opacity: 100,
+        strokeColor: this.strokeColor!,
       };
       this.existingShapes.push(shape);
     }
@@ -169,9 +208,9 @@ export class Draw {
         y2,
         x3,
         y3,
-        width: "2px",
-        strokeColor: "#fff",
+        width: this.strokeWidth,
         opacity: 100,
+        strokeColor: this.strokeColor!,
       };
 
       this.existingShapes.push(shape);
@@ -208,8 +247,8 @@ export class Draw {
         this.drawTriangle();
       }
 
-      this.context.strokeStyle = "#fff";
       this.context.stroke();
+      this.context.strokeStyle = this.strokeColor!;
       this.context.closePath();
 
       if (this.selectedId !== null) {
@@ -304,15 +343,13 @@ export class Draw {
 
           if (this.selectedId === i) {
             // Deselect
-            item.strokeColor = "#fff";
+            item.strokeColor = this.strokeColor!;
             this.selectedId = null;
           } else {
             // Deselect others
             this.existingShapes.forEach((shape, index) => {
-              if (index !== i) shape.strokeColor = "#fff";
+              if (index !== i) shape.strokeColor = this.strokeColor!;
             });
-
-            // Select current
             item.strokeColor = "red";
             this.selectedId = i;
           }
@@ -323,7 +360,7 @@ export class Draw {
 
       if (!found) {
         this.existingShapes.forEach((shape) => {
-          shape.strokeColor = "#fff";
+          shape.strokeColor = this.strokeColor!;
         });
         this.selectedId = null;
       }

@@ -7,8 +7,9 @@ import {
   selectedTools,
   topBarItems,
 } from "@/lib/utils";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import SideBar from "./SideBar";
+import { ThemeContext } from "@/lib/ThemeProvider";
 
 const Canvas = ({
   roomSlug,
@@ -21,19 +22,24 @@ const Canvas = ({
   const [selectedTools, setSelectedTools] = useState<selectedTools>("hand");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const { theme } = useContext(ThemeContext);
+
   const [details, setDetails] = useState<FormDataTypes>({
-    strokeColor: "#E0E0E0",
-    bgColor: "#1F2937",
-    strokeWidth: "2px",
-    strokeStyle: "solid",
-    sloppiness: "medium",
-    edges: "rounded",
-    opacity: 100,
+    strokeColor: null,
+    bgColor: null,
+    strokeWidth: null,
+    strokeStyle: null,
+    opacity: null,
   });
 
   useEffect(() => {
     if (canvasRef.current) {
-      const draw = new Draw(canvasRef.current, socket, roomSlug, setSelectedTools);
+      const draw = new Draw(
+        canvasRef.current,
+        socket,
+        roomSlug,
+        setSelectedTools
+      );
       setDraw(draw);
 
       return () => {
@@ -46,7 +52,19 @@ const Canvas = ({
     if (draw) {
       draw.changeSelectedTool(selectedTools);
     }
-  }, [selectedTools, details]);
+  }, [selectedTools]);
+
+  useEffect(() => {
+    if (draw) {
+      draw.changeTheme(theme);
+    }
+  }, [theme]);
+
+  useEffect(() => {
+    if (draw) {
+      draw.changeStyles(details);
+    }
+  }, [details]);
 
   return (
     <div className="w-full h-screen overflow-hidden relative">

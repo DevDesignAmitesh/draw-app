@@ -1,13 +1,11 @@
 import { FormDataTypes } from "@/lib/utils";
-import React, { useState } from "react";
+import React from "react";
 import ToggleBtn from "./ToggleBtn";
 
 const strokeColors = ["#E0E0E0", "#F87171", "#6EE7B7", "#FACC15", "#FB923C"];
 const bgColors = ["#1F2937", "#7C3AED", "#10B981", "#F59E0B", "#111827"];
-const strokeWidths = ["2px", "4px", "6px"];
+const strokeWidths = [2, 4, 6];
 const strokeStyles = ["solid", "dashed", "dotted"];
-// const sloppiness = ["low", "medium", "high"];
-// const edges = ["sharp", "rounded"];
 
 const SideBar = ({
   details,
@@ -92,38 +90,6 @@ const SideBar = ({
         </div>
       </div>
 
-      {/* Sloppiness */}
-      {/* <div>
-        <p className="text-sm font-medium mb-2">Sloppiness</p>
-        <div className="flex gap-2">
-          {sloppiness.map((s) => (
-            <button
-              key={s}
-              className={buttonClass(details.sloppiness === s)}
-              onClick={() => setDetails({ ...details, sloppiness: s })}
-            >
-              <span className="text-xs capitalize">{s[0]}</span>
-            </button>
-          ))}
-        </div>
-      </div> */}
-
-      {/* Edges */}
-      {/* <div>
-        <p className="text-sm font-medium mb-2">Edges</p>
-        <div className="flex gap-2">
-          {edges.map((e) => (
-            <button
-              key={e}
-              className={buttonClass(details.edges === e)}
-              onClick={() => setDetails({ ...details, edges: e })}
-            >
-              <span className="text-xs capitalize">{e[0]}</span>
-            </button>
-          ))}
-        </div>
-      </div> */}
-
       {/* Opacity */}
       <div>
         <p className="text-sm font-medium mb-2">Opacity</p>
@@ -131,7 +97,7 @@ const SideBar = ({
           type="range"
           min={0}
           max={100}
-          value={details.opacity}
+          value={details.opacity ?? 0}
           onChange={(e) =>
             setDetails({ ...details, opacity: Number(e.target.value) })
           }

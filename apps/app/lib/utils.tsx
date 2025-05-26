@@ -49,11 +49,9 @@ export type Shapes =
       y: number;
       w: number;
       h: number;
-      width: string;
+      width: number;
       strokeColor: string;
       fillColor?: string;
-      // sloppyNess: string;
-      // edges: number;
       opacity: number;
     }
   | {
@@ -61,11 +59,9 @@ export type Shapes =
       x: number;
       y: number;
       r: number;
-      width: string;
+      width: number;
       strokeColor: string;
       fillColor?: string;
-      // sloppyNess: string;
-      // edges: number;
       opacity: number;
     }
   | {
@@ -74,11 +70,9 @@ export type Shapes =
       y: number;
       cx: number;
       cY: number;
-      width: string;
+      width: number;
       strokeColor: string;
       fillColor?: string;
-      // sloppyNess: string;
-      // edges: number;
       opacity: number;
     }
   | {
@@ -89,11 +83,9 @@ export type Shapes =
       y2: number;
       x3: number;
       y3: number;
-      width: string;
+      width: number;
       strokeColor: string;
       fillColor?: string;
-      // sloppyNess: string;
-      // edges: number;
       opacity: number;
     };
 
@@ -276,11 +268,9 @@ export function getDistanceToTriangle({
 }
 
 export interface FormDataTypes {
-  strokeColor: string;
-  bgColor: string;
-  strokeWidth: string;
-  strokeStyle: string;
-  sloppiness: string;
-  edges: string;
-  opacity: number;
+  strokeColor: string | null;
+  bgColor: string | null;
+  strokeWidth: number | null;
+  strokeStyle: string | null;
+  opacity: number | null;
 }
