@@ -1,23 +1,78 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import InputBox from "./InputBox";
 import SuperBtn from "./SuperBtn";
 import Link from "next/link";
+import axios from "axios";
+import { HTTP_URL } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const AuthScreen = ({ isSignin }: { isSignin?: boolean }) => {
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const router = useRouter();
+
+  const handleSignin = async () => {
+    if (!email || !password) {
+      alert("fill up all the details");
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await axios.post(`${HTTP_URL}/signin`, {
+        email,
+        password,
+      });
+
+      if (res.status === 201) {
+        localStorage.setItem("token", res.data.token);
+        router.push("/dashboard");
+      }
+    } catch (err: any) {
+      alert(err?.response?.data?.message || "Sign-in failed. Try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignup = async () => {
+    if (!name || !password || !email) {
+      alert("fill up all the details");
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await axios.post(`${HTTP_URL}/signup`, {
+        name,
+        email,
+        password,
+      });
+
+      if (res.status === 201) {
+        await handleSignin();
+      }
+    } catch (err: any) {
+      alert(err?.response?.data?.message || "Sign-up failed. Try again.");
+      setLoading(false);
+    }
+  };
+
   const headingText = isSignin ? "welcome back" : "create an account";
   const subText = isSignin
-    ? "Sign in to access your diagrams" 
+    ? "Sign in to access your diagrams"
     : "Sign up to start creating your diagrams";
-  const buttonLabel = isSignin ? "Sign in" : "Sign up";
+  const buttonLabel = loading ? "Processing" : isSignin ? "Sign in" : "Sign up";
   const alternateText = isSignin
     ? "Don't have an account?"
     : "Already have an account?";
   const alternateAction = isSignin ? "Sign up" : "Sign in";
 
   return (
-    <div className="w-full h-[80vh] flex flex-col justify-center items-center p-10">
+    <div className="w-full h-screen flex flex-col justify-center items-center p-10">
       <h1 className="text-3xl font-bold text-center capitalize dark:text-white text-black">
         {headingText}
       </h1>
@@ -26,12 +81,21 @@ const AuthScreen = ({ isSignin }: { isSignin?: boolean }) => {
       </p>
       <div className="p-5 rounded-md border-2 border-neutral-600 dark:border-neutral-300 w-[450px] mt-4 flex flex-col justify-center items-center gap-4">
         {!isSignin && (
-          <InputBox value="" onChange={() => {}} type="text" label="name" />
+          <InputBox
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            label="name"
+          />
         )}
-        <InputBox value="" onChange={() => {}} type="email" label="email" />
         <InputBox
-          value=""
-          onChange={() => {}}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          type="email"
+          label="email"
+        />
+        <InputBox
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           type="password"
           label="password"
         />
@@ -39,6 +103,8 @@ const AuthScreen = ({ isSignin }: { isSignin?: boolean }) => {
           variant="primary"
           className="w-full mt-2"
           label={buttonLabel}
+          onClick={isSignin ? handleSignin : handleSignup}
+          disabled={loading}
         />
         <p className="text-neutral-600 dark:text-neutral-300 capitalize text-[14px]">
           {alternateText}{" "}

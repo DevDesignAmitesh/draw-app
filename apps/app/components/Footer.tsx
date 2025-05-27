@@ -5,7 +5,7 @@ import { FaXTwitter } from "react-icons/fa6";
 
 const Footer = () => {
   return (
-    <div className="w-full py-5 px-20 flex justify-between items-center">
+    <div className="w-full py-5 flex justify-between items-center">
       <p className="capitalize text-[14px] text-neutral-600 dark:text-neutral-400">
         © 2025 drawing app. All rights reserved.
       </p>

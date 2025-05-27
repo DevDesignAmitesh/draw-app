@@ -7,9 +7,16 @@ interface SuperBtnProps {
   variant: variant;
   className?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
 }
 
-const SuperBtn = ({ label, variant, className, onClick }: SuperBtnProps) => {
+const SuperBtn = ({
+  label,
+  variant,
+  className,
+  onClick,
+  disabled,
+}: SuperBtnProps) => {
   const primaryStyles =
     "bg-[#5B57D1] text-white dark:bg-[#B2AEFF] dark:text-[#24242D]";
   const secondaryStyles =
@@ -18,6 +25,7 @@ const SuperBtn = ({ label, variant, className, onClick }: SuperBtnProps) => {
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
       className={`rounded-md py-2 px-4 shadow-md capitalize cursor-pointer text-[14px] ${variant === "primary" ? primaryStyles : secondaryStyles} ${className}`}
     >
       {label}

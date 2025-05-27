@@ -1,9 +1,6 @@
 import {
   FormDataTypes,
-  getDistanceToCircle,
-  getDistanceToLine,
-  getDistanceToSquare,
-  getDistanceToTriangle,
+  getSelectedShapeDistance,
   selectedTools,
   Shapes,
 } from "@/lib/utils";
@@ -60,14 +57,6 @@ export class Draw {
   public changeTheme(theme: string) {
     this.theme = theme;
     this.strokeColor = this.theme === "dark" ? "#fff" : "#000";
-    this.existingShapes.forEach((shape) => {
-      if (
-        this.selectedId === null ||
-        this.existingShapes[this.selectedId] !== shape
-      ) {
-        shape.strokeColor = this.strokeColor!;
-      }
-    });
     this.renderAllShapes();
   }
 
@@ -76,12 +65,12 @@ export class Draw {
     this.strokeWidth = data.strokeWidth ?? this.strokeWidth;
     this.strokeStyle = data.strokeStyle ?? this.strokeStyle;
 
-    this.existingShapes.forEach((shape, idx) => {
-      if (this.selectedId === idx) {
-        shape.strokeColor = this.strokeColor!;
-        shape.width = this.strokeWidth;
-      }
-    });
+    if (this.selectedId !== null) {
+      const selectedShape = this.existingShapes[this.selectedId];
+      selectedShape.strokeColor = this.strokeColor!;
+      selectedShape.width = this.strokeWidth;
+    }
+
     this.renderAllShapes();
   }
 
@@ -247,8 +236,27 @@ export class Draw {
         this.drawTriangle();
       }
 
+      if (this.selectedTools === "eraser") {
+        const rect = this.canvas.getBoundingClientRect();
+        this.currentX = e.clientX - rect.left;
+        this.currentY = e.clientY - rect.top;
+
+        const result = getSelectedShapeDistance({
+          existingShapes: this.existingShapes,
+          currentX: this.currentX,
+          currentY: this.currentY,
+        });
+
+        if (result.distance === 0 && result.index !== null) {
+          const last = this.existingShapes[result.index];
+          this.existingShapes.splice(result.index, 1);
+          this.undoShapes.push(last);
+        }
+      }
+
       this.context.stroke();
       this.context.strokeStyle = this.strokeColor!;
+      this.context.lineWidth = this.strokeWidth;
       this.context.closePath();
 
       if (this.selectedId !== null) {
@@ -281,84 +289,30 @@ export class Draw {
       this.currentX = e.clientX - rect.left;
       this.currentY = e.clientY - rect.top;
 
-      let found = false;
+      const result = getSelectedShapeDistance({
+        existingShapes: this.existingShapes,
+        currentX: this.currentX,
+        currentY: this.currentY,
+      });
 
-      for (let i = 0; i < this.existingShapes.length; i++) {
-        const item = this.existingShapes[i];
+      if (result.distance === 0) {
+        result.found = true;
 
-        let distance = Infinity;
-
-        if (item.type === "square") {
-          distance = getDistanceToSquare({
-            canvasMouseX: this.currentX,
-            canvasMouseY: this.currentY,
-            squareH: item.h,
-            squareW: item.w,
-            squareX: item.x,
-            squareY: item.y,
+        if (this.selectedId === result.index) {
+          // Deselect
+          result.item.strokeColor = this.strokeColor!;
+          this.selectedId = null;
+        } else {
+          // Deselect others
+          this.existingShapes.forEach((shape, index) => {
+            if (index !== result.index) shape.strokeColor = this.strokeColor!;
           });
-        }
-
-        if (item.type === "circle") {
-          distance = getDistanceToCircle({
-            canvasMouseX: this.currentX,
-            canvasMouseY: this.currentY,
-            mouseX: item.x,
-            mouseY: item.y,
-          });
-
-          // For circle, distance from center must be <= radius
-          if (distance <= item.r) distance = 0;
-        }
-
-        if (item.type === "line") {
-          distance = getDistanceToLine({
-            canvasMouseX: this.currentX,
-            canvasMouseY: this.currentY,
-            lineStartX: item.x,
-            lineStartY: item.y,
-            lineEndX: item.cx,
-            lineEndY: item.cY,
-          });
-
-          // You may want to allow some tolerance for thin lines
-          if (distance <= 5) distance = 0;
-        }
-
-        if (item.type === "triangle") {
-          distance = getDistanceToTriangle({
-            canvasMouseX: this.currentX,
-            canvasMouseY: this.currentY,
-            triX1: item.x1,
-            triY1: item.y1,
-            triX2: item.x2,
-            triY2: item.y2,
-            triX3: item.x3,
-            triY3: item.y3,
-          });
-        }
-
-        if (distance === 0) {
-          found = true;
-
-          if (this.selectedId === i) {
-            // Deselect
-            item.strokeColor = this.strokeColor!;
-            this.selectedId = null;
-          } else {
-            // Deselect others
-            this.existingShapes.forEach((shape, index) => {
-              if (index !== i) shape.strokeColor = this.strokeColor!;
-            });
-            item.strokeColor = "red";
-            this.selectedId = i;
-          }
-
-          break;
+          result.item.strokeColor = "red";
+          this.selectedId = result.index;
         }
       }
 
-      if (!found) {
+      if (!result.found) {
         this.existingShapes.forEach((shape) => {
           shape.strokeColor = this.strokeColor!;
         });

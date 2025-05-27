@@ -1,4 +1,5 @@
 import Hero from "@/components/Hero";
+import Footer from "@/components/Footer";
 import VideoDemo from "@/components/VideoDemo";
 import React from "react";
 
@@ -7,6 +8,7 @@ const page = () => {
     <div className="w-full h-auto relative">
       <Hero />
       <VideoDemo />
+      <Footer />
     </div>
   );
 };

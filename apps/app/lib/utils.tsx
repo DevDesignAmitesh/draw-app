@@ -267,6 +267,85 @@ export function getDistanceToTriangle({
   return Math.min(d1, d2, d3);
 }
 
+export function getSelectedShapeDistance({
+  existingShapes,
+  currentX,
+  currentY,
+}: {
+  existingShapes: any[];
+  currentX: number;
+  currentY: number;
+}) {
+  for (let i = 0; i < existingShapes.length; i++) {
+    const item = existingShapes[i];
+    let distance = Infinity;
+
+    if (item.type === "square") {
+      distance = getDistanceToSquare({
+        canvasMouseX: currentX,
+        canvasMouseY: currentY,
+        squareH: item.h,
+        squareW: item.w,
+        squareX: item.x,
+        squareY: item.y,
+      });
+    }
+
+    if (item.type === "circle") {
+      distance = getDistanceToCircle({
+        canvasMouseX: currentX,
+        canvasMouseY: currentY,
+        mouseX: item.x,
+        mouseY: item.y,
+      });
+
+      if (distance <= item.r) distance = 0;
+    }
+
+    if (item.type === "line") {
+      distance = getDistanceToLine({
+        canvasMouseX: currentX,
+        canvasMouseY: currentY,
+        lineStartX: item.x,
+        lineStartY: item.y,
+        lineEndX: item.cx,
+        lineEndY: item.cY,
+      });
+
+      if (distance <= 5) distance = 0;
+    }
+
+    if (item.type === "triangle") {
+      distance = getDistanceToTriangle({
+        canvasMouseX: currentX,
+        canvasMouseY: currentY,
+        triX1: item.x1,
+        triY1: item.y1,
+        triX2: item.x2,
+        triY2: item.y2,
+        triX3: item.x3,
+        triY3: item.y3,
+      });
+    }
+
+    if (distance === 0) {
+      return {
+        found: true,
+        index: i,
+        item,
+        distance,
+      };
+    }
+  }
+
+  return {
+    found: false,
+    index: null,
+    item: null,
+    distance: Infinity,
+  };
+}
+
 export interface FormDataTypes {
   strokeColor: string | null;
   bgColor: string | null;
@@ -274,3 +353,6 @@ export interface FormDataTypes {
   strokeStyle: string | null;
   opacity: number | null;
 }
+
+export const HTTP_URL = "http://localhost:5000/api/v1";
+export const WS_URL = "http://localhost:8080";
