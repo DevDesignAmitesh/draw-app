@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import SuperBtn from "./SuperBtn";
 import ToggleBtn from "./ToggleBtn";
@@ -6,6 +8,7 @@ import { useAuthContext } from "@/context/AuthContext";
 
 const Header = () => {
   const { authenticated } = useAuthContext();
+  console.log(authenticated);
   return (
     <div className="w-full py-5 bg-white dark:bg-[#121212] text-black dark:text-white px-20 flex justify-between items-center">
       {authenticated ? (

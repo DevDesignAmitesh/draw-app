@@ -9,10 +9,13 @@ export const ThemeContext = createContext({
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState("light");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "dark";
     setTheme(savedTheme);
+    setMounted(true);
+
     document.documentElement.classList.add(savedTheme);
   }, []);
 
@@ -22,6 +25,10 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
   };
+
+  if (!mounted) {
+    return <div>loading...</div>;
+  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>

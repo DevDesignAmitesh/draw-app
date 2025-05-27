@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import {
   createContext,
   useContext,
@@ -16,21 +15,23 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const router = useRouter();
   const [authenticated, setAuthenticated] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
 
     if (!storedToken) {
       setAuthenticated(false);
-      router.push("/auth");
     } else {
       setAuthenticated(true);
     }
-  }, []);
+    setMounted(true);
+  }, [authenticated]);
 
-  if (!authenticated) return <div>loading...</div>;
+  if (!mounted) {
+    return <div>loading...</div>;
+  }
 
   return (
     <AuthContext.Provider value={{ authenticated }}>

@@ -1,16 +1,14 @@
 import Header from "@/components/Header";
 
-export default function RootLayout({
+export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="className=flex flex-col min-h-screen">
-        <Header />
-        <div className="px-20">{children}</div>
-      </body>
-    </html>
+    <>
+      <Header />
+      <div className="px-20">{children}</div>
+    </>
   );
 }
