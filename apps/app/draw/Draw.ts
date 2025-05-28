@@ -23,16 +23,19 @@ export class Draw {
   public strokeWidth: number;
   public strokeStyle: string;
   public strokeColor: string | null;
-  public theme: string | null;
+  public details: FormDataTypes;
+  private originalColors: Map<number, string> = new Map();
 
   constructor(
     canvas: HTMLCanvasElement,
     ws: WebSocket,
     roomSlug: string,
-    setSelectedTools: React.Dispatch<React.SetStateAction<selectedTools>>
+    setSelectedTools: React.Dispatch<React.SetStateAction<selectedTools>>,
+    theme: string,
+    details: FormDataTypes
   ) {
-    this.theme = null;
-    this.strokeColor = null;
+    this.details = details;
+    this.strokeColor = theme === "dark" ? "#fff" : "#000";
     this.strokeWidth = 2;
     this.strokeStyle = "solid";
     this.existingShapes = [];
@@ -55,30 +58,54 @@ export class Draw {
   }
 
   public changeTheme(theme: string) {
-    this.theme = theme;
-    this.strokeColor = this.theme === "dark" ? "#fff" : "#000";
+    this.strokeColor = theme === "dark" ? "#fff" : "#000";
+
+    this.existingShapes.forEach((item, index) => {
+      if (!this.originalColors.has(index)) {
+        item.strokeColor = this.strokeColor!;
+      }
+    });
+
     this.renderAllShapes();
   }
 
   public changeStyles(data: FormDataTypes) {
+    if (this.selectedId !== null) {
+      let selectedShape = this.existingShapes[this.selectedId];
+
+      const newColor = data.strokeColor ?? selectedShape.strokeColor;
+      const newWidth = data.strokeWidth ?? selectedShape.width;
+      const newStyle = data.strokeStyle ?? selectedShape.strokeStyle;
+
+      selectedShape.strokeColor = newColor;
+      selectedShape.width = newWidth;
+      selectedShape.strokeStyle = newStyle;
+
+      this.originalColors.set(this.selectedId, newColor);
+
+      selectedShape.strokeColor = "red";
+    }
+
     this.strokeColor = data.strokeColor ?? this.strokeColor;
     this.strokeWidth = data.strokeWidth ?? this.strokeWidth;
     this.strokeStyle = data.strokeStyle ?? this.strokeStyle;
-
-    if (this.selectedId !== null) {
-      const selectedShape = this.existingShapes[this.selectedId];
-      selectedShape.strokeColor = this.strokeColor!;
-      selectedShape.width = this.strokeWidth;
-    }
 
     this.renderAllShapes();
   }
 
   public renderAllShapes = () => {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.existingShapes.map((item) => {
-      console.log(item);
+    this.existingShapes.map((item, index) => {
       this.context.beginPath();
+
+      if (item.strokeStyle === "solid") {
+        this.context.setLineDash([]);
+      } else if (item.strokeStyle === "dotted") {
+        this.context.setLineDash([2, 4]);
+      } else if (item.strokeStyle === "dashed") {
+        this.context.setLineDash([10, 5]);
+      }
+
       this.context.strokeStyle = item.strokeColor;
       this.context.lineWidth = item.width;
 
@@ -99,6 +126,9 @@ export class Draw {
 
   public changeSelectedTool = (tool: selectedTools) => {
     this.selectedTools = tool;
+    if (this.details.strokeColor) this.strokeColor = this.details.strokeColor;
+    if (this.details.strokeWidth) this.strokeWidth = this.details.strokeWidth;
+    if (this.details.strokeStyle) this.strokeStyle = this.details.strokeStyle;
   };
 
   private startHandler = () => {
@@ -135,6 +165,11 @@ export class Draw {
   private mouseUpHandler = () => {
     this.isDrawing = false;
     let shape: Shapes;
+
+    const currentStrokeColor = this.details.strokeColor || this.strokeColor!;
+    const currentStrokeWidth = this.details.strokeWidth || this.strokeWidth;
+    const currentStrokeStyle = this.details.strokeStyle || this.strokeStyle;
+
     if (this.selectedTools === "square") {
       let w = this.currentX - this.startX;
       let h = this.currentY - this.startY;
@@ -144,9 +179,10 @@ export class Draw {
         y: this.startY,
         w,
         h,
-        width: this.strokeWidth,
+        width: currentStrokeWidth,
         opacity: 100,
-        strokeColor: this.strokeColor!,
+        strokeColor: currentStrokeColor,
+        strokeStyle: currentStrokeStyle,
       };
       this.existingShapes.push(shape);
     }
@@ -160,9 +196,10 @@ export class Draw {
         x: this.startX,
         y: this.startY,
         r,
-        width: this.strokeWidth,
+        width: currentStrokeWidth,
         opacity: 100,
-        strokeColor: this.strokeColor!,
+        strokeColor: currentStrokeColor,
+        strokeStyle: currentStrokeStyle,
       };
       this.existingShapes.push(shape);
     }
@@ -174,9 +211,10 @@ export class Draw {
         y: this.startY,
         cx: this.currentX,
         cY: this.currentY,
-        width: this.strokeWidth,
+        width: currentStrokeWidth,
         opacity: 100,
-        strokeColor: this.strokeColor!,
+        strokeColor: currentStrokeColor,
+        strokeStyle: currentStrokeStyle,
       };
       this.existingShapes.push(shape);
     }
@@ -197,9 +235,10 @@ export class Draw {
         y2,
         x3,
         y3,
-        width: this.strokeWidth,
+        width: currentStrokeWidth,
         opacity: 100,
-        strokeColor: this.strokeColor!,
+        strokeColor: currentStrokeColor,
+        strokeStyle: currentStrokeStyle,
       };
 
       this.existingShapes.push(shape);
@@ -215,10 +254,25 @@ export class Draw {
       this.currentY = e.clientY - rect.top;
 
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
       this.renderAllShapes();
 
       this.context.beginPath();
+
+      // Use current properties for preview
+      const currentStrokeStyle = this.details.strokeStyle || this.strokeStyle;
+      const currentStrokeColor = this.details.strokeColor || this.strokeColor!;
+      const currentStrokeWidth = this.details.strokeWidth || this.strokeWidth;
+
+      if (currentStrokeStyle === "solid") {
+        this.context.setLineDash([]);
+      } else if (currentStrokeStyle === "dotted") {
+        this.context.setLineDash([2, 4]);
+      } else if (currentStrokeStyle === "dashed") {
+        this.context.setLineDash([10, 5]);
+      }
+
+      this.context.strokeStyle = currentStrokeColor;
+      this.context.lineWidth = currentStrokeWidth;
 
       if (this.selectedTools === "square") {
         this.drawSquare();
@@ -251,12 +305,12 @@ export class Draw {
           const last = this.existingShapes[result.index];
           this.existingShapes.splice(result.index, 1);
           this.undoShapes.push(last);
+          // Clean up originalColors map
+          this.originalColors.delete(result.index);
         }
       }
 
       this.context.stroke();
-      this.context.strokeStyle = this.strokeColor!;
-      this.context.lineWidth = this.strokeWidth;
       this.context.closePath();
 
       if (this.selectedId !== null) {
@@ -299,23 +353,40 @@ export class Draw {
         result.found = true;
 
         if (this.selectedId === result.index) {
-          // Deselect
-          result.item.strokeColor = this.strokeColor!;
+          // Deselect - restore original color
+          const originalColor =
+            this.originalColors.get(result.index!) || this.strokeColor!;
+          result.item.strokeColor = originalColor;
+          this.originalColors.delete(result.index!);
           this.selectedId = null;
         } else {
-          // Deselect others
+          // Deselect others - restore their original colors
           this.existingShapes.forEach((shape, index) => {
-            if (index !== result.index) shape.strokeColor = this.strokeColor!;
+            if (index !== result.index && this.originalColors.has(index)) {
+              const originalColor =
+                this.originalColors.get(index) || this.strokeColor!;
+              shape.strokeColor = originalColor;
+              this.originalColors.delete(index);
+            }
           });
+
+          // Select new shape - store its current color and make it red
+          this.originalColors.set(result.index!, result.item.strokeColor);
           result.item.strokeColor = "red";
           this.selectedId = result.index;
         }
       }
 
       if (!result.found) {
-        this.existingShapes.forEach((shape) => {
-          shape.strokeColor = this.strokeColor!;
+        // Deselect all - restore all original colors
+        this.existingShapes.forEach((shape, index) => {
+          if (this.originalColors.has(index)) {
+            const originalColor =
+              this.originalColors.get(index) || this.strokeColor!;
+            shape.strokeColor = originalColor;
+          }
         });
+        this.originalColors.clear();
         this.selectedId = null;
       }
 
@@ -373,13 +444,11 @@ export class Draw {
     y3: number;
   }) => {
     if (!shape) {
-      // If no shape provided, draw based on current mouse positions, e.g., an equilateral triangle or from startX/startY to currentX/currentY
       const x1 = this.startX;
       const y1 = this.startY;
       const x2 = this.currentX;
       const y2 = this.currentY;
-      // Calculate third point to form a triangle (for example, an isosceles triangle)
-      const x3 = x1 * 2 - x2; // Just a simple example: mirror point
+      const x3 = x1 * 2 - x2;
       const y3 = y2;
 
       this.context.moveTo(x1, y1);
@@ -398,6 +467,13 @@ export class Draw {
     if (this.existingShapes.length === 0) return;
     let last = this.existingShapes.pop()!;
     this.undoShapes.push(last);
+
+    // Clean up selection if the undone shape was selected
+    if (this.selectedId === this.existingShapes.length) {
+      this.selectedId = null;
+      this.originalColors.clear();
+    }
+
     this.renderAllShapes();
   };
 

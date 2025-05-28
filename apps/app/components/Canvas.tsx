@@ -25,20 +25,23 @@ const Canvas = ({
   const { theme } = useContext(ThemeContext);
 
   const [details, setDetails] = useState<FormDataTypes>({
-    strokeColor: null,
-    bgColor: null,
-    strokeWidth: null,
-    strokeStyle: null,
-    opacity: null,
+    strokeColor: theme === "dark" ? "#fff" : "#000",
+    bgColor: "#000",
+    strokeWidth: 2,
+    strokeStyle: "solid",
+    opacity: 100,
   });
 
   useEffect(() => {
+    console.log(theme);
     if (canvasRef.current) {
       const draw = new Draw(
         canvasRef.current,
         socket,
         roomSlug,
-        setSelectedTools
+        setSelectedTools,
+        theme,
+        details
       );
       setDraw(draw);
 
@@ -56,6 +59,7 @@ const Canvas = ({
 
   useEffect(() => {
     if (draw) {
+      console.log("run");
       draw.changeTheme(theme);
     }
   }, [theme]);

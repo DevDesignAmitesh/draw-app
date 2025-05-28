@@ -52,6 +52,7 @@ export type Shapes =
       width: number;
       strokeColor: string;
       fillColor?: string;
+      strokeStyle?: string;
       opacity: number;
     }
   | {
@@ -62,6 +63,7 @@ export type Shapes =
       width: number;
       strokeColor: string;
       fillColor?: string;
+      strokeStyle?: string;
       opacity: number;
     }
   | {
@@ -73,6 +75,7 @@ export type Shapes =
       width: number;
       strokeColor: string;
       fillColor?: string;
+      strokeStyle?: string;
       opacity: number;
     }
   | {
@@ -86,6 +89,7 @@ export type Shapes =
       width: number;
       strokeColor: string;
       fillColor?: string;
+      strokeStyle?: string;
       opacity: number;
     };
 
