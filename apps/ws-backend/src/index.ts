@@ -58,44 +58,6 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
       users.filter((user) => user.ws !== ws);
     }
 
-    if (parsedMessage.type === "chat") {
-      const { payload } = parsedMessage;
-      try {
-        const room = await prisma.room.findUnique({
-          where: {
-            slug: payload.roomSlug,
-          },
-        });
-
-        if (!room) {
-          ws.close();
-          return;
-        }
-
-        await prisma.chat.create({
-          data: {
-            message: payload.message,
-            roomId: room.id,
-            userId,
-          },
-        });
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-
-      users.forEach((user) => {
-        if (user.ws !== ws && user.roomSlug === payload.roomSlug) {
-          user.ws.send(
-            JSON.stringify({
-              type: "chat",
-              message: payload.message,
-            })
-          );
-        }
-      });
-    }
-
     if (parsedMessage.type === "shapes") {
       const { payload } = parsedMessage;
       try {
