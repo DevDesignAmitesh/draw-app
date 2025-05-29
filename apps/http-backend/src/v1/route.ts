@@ -117,32 +117,6 @@ v1Router.get(
 );
 
 v1Router.get(
-  "/chats/:slug",
-  middleware,
-  async (req: Request, res: Response): Promise<any> => {
-    try {
-      const slug = req.params.slug;
-
-      const chats = await prisma.room.findUnique({
-        where: {
-          slug,
-        },
-        include: {
-          chats: true,
-        },
-      });
-
-      return res
-        .json({ message: "chats found", chats: chats?.chats })
-        .status(201);
-    } catch (error) {
-      console.log(error);
-      return res.json({ message: "internal server error" }).status(500);
-    }
-  }
-);
-
-v1Router.get(
   "/shapes/:slug",
   middleware,
   async (req: Request, res: Response): Promise<any> => {

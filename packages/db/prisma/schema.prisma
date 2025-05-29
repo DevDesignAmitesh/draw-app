@@ -13,18 +13,8 @@ model User {
   name       String
   password   String
   isVerified Boolean  @default(false)
-  chats      Chat[]
   rooms      Room[]
   shapes     Shapes[]
-}
-
-model Chat {
-  id      String @id @default(uuid())
-  message String
-  userId  String
-  roomId  String
-  user    User   @relation(fields: [userId], references: [id])
-  room    Room   @relation(fields: [roomId], references: [id])
 }
 
 model Shapes {
@@ -43,6 +33,5 @@ model Room {
   adminId String @unique
   user    User   @relation(fields: [adminId], references: [id])
 
-  chats  Chat[]
   shapes Shapes[]
 }
