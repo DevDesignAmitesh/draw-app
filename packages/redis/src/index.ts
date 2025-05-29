@@ -5,21 +5,36 @@ import { usersProps } from "@repo/types/types";
 const subscribedRooms = new Set<string>();
 
 export class Redis {
-  private static instance: RedisClientType | null = null;
+  private static commandClient: RedisClientType | null = null;
+  private static subscriberClient: RedisClientType | null = null;
   private static readonly shapesQueueKey = "shapes:232392834ffierveru";
 
-  public static async getInstance(): Promise<RedisClientType> {
-    if (!Redis.instance) {
-      Redis.instance = createClient();
+  public static async getCommandClient(): Promise<RedisClientType> {
+    if (!Redis.commandClient) {
+      Redis.commandClient = createClient();
 
-      Redis.instance.on("error", (err) => {
+      Redis.commandClient.on("error", (err) => {
         console.error("Redis Error:", err);
       });
 
-      await Redis.instance.connect();
+      await Redis.commandClient.connect();
     }
 
-    return Redis.instance;
+    return Redis.commandClient;
+  }
+
+  public static async getSubscriberClient(): Promise<RedisClientType> {
+    if (!Redis.subscriberClient) {
+      Redis.subscriberClient = createClient();
+
+      Redis.subscriberClient.on("error", (err) => {
+        console.error("Redis Error:", err);
+      });
+
+      await Redis.subscriberClient.connect();
+    }
+
+    return Redis.subscriberClient;
   }
 
   public static async subscribeAndSend(
@@ -28,7 +43,8 @@ export class Redis {
     users: usersProps[]
   ) {
     try {
-      const client = await Redis.getInstance();
+      console.log("in the subscribeAndSend");
+      const client = await Redis.getSubscriberClient();
 
       if (!subscribedRooms.has(roomSlug)) {
         subscribedRooms.add(roomSlug);
@@ -60,7 +76,7 @@ export class Redis {
 
   public static async unSubscribe(roomSlug: string) {
     try {
-      const client = await Redis.getInstance();
+      const client = await Redis.getSubscriberClient();
       await client.unsubscribe(`shapes:${roomSlug}`);
       subscribedRooms.delete(roomSlug);
     } catch (e) {
@@ -74,7 +90,8 @@ export class Redis {
     userId: string
   ) {
     try {
-      const redis = await Redis.getInstance();
+      console.log("in the putShapesInQueue");
+      const redis = await Redis.getCommandClient();
       await redis.lPush(
         Redis.shapesQueueKey,
         JSON.stringify({ roomSlug, message, userId })
@@ -92,7 +109,7 @@ export class Redis {
     }) => Promise<void>
   ) {
     try {
-      const client = await Redis.getInstance();
+      const client = await Redis.getCommandClient();
 
       while (true) {
         const result = await client.brPop(Redis.shapesQueueKey, 0);

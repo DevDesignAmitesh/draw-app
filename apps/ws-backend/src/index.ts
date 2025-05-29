@@ -1,13 +1,14 @@
+import { config } from "dotenv";
+config();
 import { JwtPayload, verify } from "jsonwebtoken";
 import { WebSocket, WebSocketServer } from "ws";
-import { JWT_SECRET } from "@repo/envs/envs";
 import { usersProps } from "@repo/types/types";
 import { Redis } from "@repo/redis/db";
 
 const users: usersProps[] = [];
 
 function checkUserAuth(token: string): string | null {
-  const decoded = verify(token, JWT_SECRET) as JwtPayload;
+  const decoded = verify(token, process.env.JWT_SECRET!) as JwtPayload;
   if (!decoded.userId) {
     return null;
   }
@@ -38,8 +39,9 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
 
   ws.on("message", async (e) => {
     const parsedMessage = JSON.parse(e.toString());
-
+    console.log(parsedMessage);
     if (parsedMessage.type === "join_room") {
+      console.log("hello in the join room");
       const { roomSlug } = parsedMessage.payload;
       users.push({
         ws,
@@ -69,6 +71,7 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
     }
 
     if (parsedMessage.type === "shapes") {
+      console.log("in the shapes")
       const { roomSlug, message } = parsedMessage.payload;
       await Redis.putShapesInQueue(roomSlug, message, userId);
     }

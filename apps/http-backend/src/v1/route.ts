@@ -4,7 +4,6 @@ import { prisma } from "@repo/db/db";
 import { hash, compare } from "bcryptjs";
 import { SigninTypes, SignupTypes, CreateRoomTypes } from "@repo/types/types";
 import { JwtPayload, sign } from "jsonwebtoken";
-import { JWT_SECRET } from "@repo/envs/envs";
 import { nanoid } from "nanoid";
 
 export const v1Router: Router = Router();
@@ -13,7 +12,7 @@ v1Router.post("/signup", async (req: Request, res: Response): Promise<any> => {
   const result = SignupTypes.safeParse(req.body);
 
   if (!result.success && !result.data) {
-    return res.json({ message: "invalid inputs" }).status(404);
+    return res.status(404).json({ message: "invalid inputs" });
   }
 
   const hashedPassword = await hash(result.data.password, 5);
@@ -32,14 +31,14 @@ v1Router.post("/signup", async (req: Request, res: Response): Promise<any> => {
       .status(404);
   }
 
-  return res.json({ message: "user created" }).status(201);
+  return res.status(201).json({ message: "user created" });
 });
 
 v1Router.post("/signin", async (req: Request, res: Response): Promise<any> => {
   const result = SigninTypes.safeParse(req.body);
 
   if (!result.success && !result.data) {
-    return res.json({ message: "invalid inputs" }).status(404);
+    return res.status(404).json({ message: "invalid inputs" });
   }
 
   const user = await prisma.user.findFirst({
@@ -48,19 +47,28 @@ v1Router.post("/signin", async (req: Request, res: Response): Promise<any> => {
 
   if (!user) {
     return res
-      .json({ message: "user not found with the email" + result.data.email })
+      .json({ message: "user not found with the email " + result.data.email })
       .status(401);
   }
 
   const isPasswordRight = await compare(result.data.password, user.password);
 
   if (!isPasswordRight) {
-    return res.json({ message: "wrong password" }).status(401);
+    return res.status(401).json({ message: "wrong password" });
   }
 
-  const token = sign({ userId: user.id }, JWT_SECRET);
+  console.log(process.env.JWT_SECRET);
+  console.log(user);
 
-  return res.json({ message: "successfull", token }).status(201);
+  if (!process.env.JWT_SECRET) {
+    return res.status(201).json({ message: "jwt token not found" });
+  }
+
+  const token = sign({ userId: user.id }, process.env.JWT_SECRET);
+
+  console.log(token);
+
+  return res.status(201).json({ message: "successfull", token });
 });
 
 v1Router.post(
@@ -71,7 +79,7 @@ v1Router.post(
     const adminId = (req as JwtPayload).user.userId;
 
     if (!result.success && !result.data) {
-      return res.json({ message: "invalid inputs" }).status(404);
+      return res.status(404).json({ message: "invalid inputs" });
     }
 
     try {
@@ -108,10 +116,10 @@ v1Router.get(
         },
       });
 
-      return res.json({ message: "rooms found", rooms }).status(201);
+      return res.status(201).json({ message: "rooms found", rooms });
     } catch (error) {
       console.log(error);
-      return res.json({ message: "internal server error" }).status(500);
+      return res.status(500).json({ message: "internal server error" });
     }
   }
 );
@@ -137,7 +145,7 @@ v1Router.get(
         .status(201);
     } catch (error) {
       console.log(error);
-      return res.json({ message: "internal server error" }).status(500);
+      return res.status(500).json({ message: "internal server error" });
     }
   }
 );
