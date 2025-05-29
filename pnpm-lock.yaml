@@ -98,6 +98,18 @@ importers:
         specifier: ^9.0.9
         version: 9.0.9
 
+  apps/worker:
+    devDependencies:
+      '@repo/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@repo/redis':
+        specifier: workspace:*
+        version: link:../../packages/redis
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
+
   apps/ws-backend:
     dependencies:
       ws:
@@ -110,6 +122,12 @@ importers:
       '@repo/envs':
         specifier: workspace:*
         version: link:../../packages/envs
+      '@repo/redis':
+        specifier: workspace:*
+        version: link:../../packages/redis
+      '@repo/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
@@ -193,16 +211,31 @@ importers:
 
   packages/redis:
     dependencies:
+      '@types/ws':
+        specifier: ^8.18.1
+        version: 8.18.1
       redis:
         specifier: ^5.1.0
         version: 5.1.0
+      ws:
+        specifier: ^8.18.2
+        version: 8.18.2
     devDependencies:
+      '@repo/types':
+        specifier: workspace:*
+        version: link:../types
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
 
   packages/types:
     dependencies:
+      '@types/ws':
+        specifier: ^8.18.1
+        version: 8.18.1
+      ws:
+        specifier: ^8.18.2
+        version: 8.18.2
       zod:
         specifier: ^3.24.4
         version: 3.24.4

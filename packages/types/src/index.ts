@@ -1,4 +1,5 @@
 import z from "zod";
+import { WebSocket } from "ws";
 
 export const SignupTypes = z.object({
   name: z.string().min(3, "name is too short"),
@@ -15,3 +16,10 @@ export const CreateRoomTypes = z.object({
   name: z.string().min(3, "name is too short"),
   slug: z.string(),
 });
+
+export interface usersProps {
+  ws: WebSocket;
+  userId: string;
+  roomSlug: string;
+  subscribedRoom?: Set<string>;
+}

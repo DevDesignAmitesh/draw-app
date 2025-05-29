@@ -1,15 +1,10 @@
 import { JwtPayload, verify } from "jsonwebtoken";
 import { WebSocket, WebSocketServer } from "ws";
-import { prisma } from "@repo/db/db";
 import { JWT_SECRET } from "@repo/envs/envs";
+import { usersProps } from "@repo/types/types";
+import { Redis } from "@repo/redis/db";
 
-interface usersProps {
-  ws: WebSocket;
-  roomSlug: string | null;
-  userId: string;
-}
-
-let users: usersProps[] = [];
+const users: usersProps[] = [];
 
 function checkUserAuth(token: string): string | null {
   const decoded = verify(token, JWT_SECRET) as JwtPayload;
@@ -25,7 +20,6 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
   const url = req.url;
 
   if (!url) {
-    ws.close();
     return;
   }
 
@@ -33,13 +27,12 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
   const token = queryParam.get("token");
 
   if (!token) {
-    return ws.close();
+    return;
   }
 
   const userId = checkUserAuth(token);
 
   if (!userId) {
-    ws.close();
     return;
   }
 
@@ -47,58 +40,43 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
     const parsedMessage = JSON.parse(e.toString());
 
     if (parsedMessage.type === "join_room") {
+      const { roomSlug } = parsedMessage.payload;
       users.push({
         ws,
-        roomSlug: parsedMessage.payload.roomSlug,
         userId,
+        roomSlug,
       });
+      await Redis.subscribeAndSend(ws, roomSlug, users);
     }
 
     if (parsedMessage.type === "leave_room") {
-      users.filter((user) => user.ws !== ws);
+      const { roomSlug } = parsedMessage.payload;
+      const userIndex = users.findIndex((user) => user.ws === ws);
+      const user = users[userIndex];
+
+      if (user) {
+        if (user.subscribedRoom?.has(roomSlug)) {
+          user.subscribedRoom.delete(roomSlug);
+          users.splice(userIndex, 1);
+        }
+      }
+
+      const isRoomNeeded = users.some((u) => u.subscribedRoom?.has(roomSlug));
+
+      if (!isRoomNeeded) {
+        await Redis.unSubscribe(roomSlug);
+      }
     }
 
     if (parsedMessage.type === "shapes") {
-      const { payload } = parsedMessage;
-      try {
-        const room = await prisma.room.findUnique({
-          where: {
-            slug: payload.roomSlug,
-          },
-        });
-
-        if (!room) {
-          ws.close();
-          return;
-        }
-
-        await prisma.shapes.create({
-          data: {
-            message: payload.message,
-            roomId: room.id,
-            userId,
-          },
-        });
-      } catch (error) {
-        console.log(error);
-        return;
-      }
-
-      users.forEach((user) => {
-        if (user.ws !== ws && user.roomSlug === payload.roomSlug) {
-          user.ws.send(
-            JSON.stringify({
-              type: "shapes",
-              message: payload.message,
-            })
-          );
-        }
-      });
+      const { roomSlug, message } = parsedMessage.payload;
+      await Redis.putShapesInQueue(roomSlug, message, userId);
     }
   });
 
   ws.on("close", () => {
-    users.filter((user) => user.ws !== ws);
+    const index = users.findIndex((user) => user.ws === ws);
+    if (index !== -1) users.splice(index, 1);
   });
 
   ws.on("error", (e) => console.log(e));

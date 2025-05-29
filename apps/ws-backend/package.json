@@ -12,6 +12,8 @@
   },
   "devDependencies": {
     "@repo/db": "workspace:*",
+    "@repo/redis": "workspace:*",
+    "@repo/types": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/envs": "workspace:*",
     "@types/jsonwebtoken": "^9.0.9",

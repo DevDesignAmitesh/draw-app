@@ -1,5 +1,5 @@
 {
-  "name": "redis",
+  "name": "@repo/redis",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -11,6 +11,7 @@
     "./db": "./dist/index.js"
   },
   "devDependencies": {
+    "@repo/types": "workspace:*",
     "@repo/typescript-config": "workspace:*"
   },
   "keywords": [],
@@ -18,6 +19,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "redis": "^5.1.0"
+    "@types/ws": "^8.18.1",
+    "redis": "^5.1.0",
+    "ws": "^8.18.2"
   }
 }
