@@ -6,8 +6,12 @@ export async function getAllShapes(slug: string): Promise<Shapes[]> {
     const res = await axios.get(`${HTTP_URL}/shapes/${slug}`, {
       headers: { Authorization: localStorage.getItem("token") },
     });
-    console.log(res.data.shapes);
-    return res.data.shapes ?? [];
+    let shape: Shapes[] = [];
+    res.data.shapes.forEach((item: any) => {
+      const parsed = JSON.parse(item.message);
+      shape.push(parsed);
+    });
+    return shape;
   } catch (error) {
     console.log(error);
     return [];

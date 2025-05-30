@@ -8,11 +8,16 @@ import { Redis } from "@repo/redis/db";
 const users: usersProps[] = [];
 
 function checkUserAuth(token: string): string | null {
-  const decoded = verify(token, process.env.JWT_SECRET!) as JwtPayload;
-  if (!decoded.userId) {
+  try {
+    const decoded = verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    if (!decoded.userId) {
+      return null;
+    }
+    return decoded.userId;
+  } catch (error) {
+    console.log(error);
     return null;
   }
-  return decoded.userId;
 }
 
 const wss = new WebSocketServer({ port: 8080 });
@@ -39,9 +44,8 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
 
   ws.on("message", async (e) => {
     const parsedMessage = JSON.parse(e.toString());
-    console.log(parsedMessage);
     if (parsedMessage.type === "join_room") {
-      console.log("hello in the join room");
+      console.log(parsedMessage);
       const { roomSlug } = parsedMessage.payload;
       users.push({
         ws,
@@ -71,7 +75,6 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
     }
 
     if (parsedMessage.type === "shapes") {
-      console.log("in the shapes")
       const { roomSlug, message } = parsedMessage.payload;
       await Redis.putShapesInQueue(roomSlug, message, userId);
     }
@@ -81,6 +84,4 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
     const index = users.findIndex((user) => user.ws === ws);
     if (index !== -1) users.splice(index, 1);
   });
-
-  ws.on("error", (e) => console.log(e));
 });

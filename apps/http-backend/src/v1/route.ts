@@ -129,13 +129,11 @@ v1Router.get(
   middleware,
   async (req: Request, res: Response): Promise<any> => {
     try {
-      const adminId = (req as JwtPayload).user.userId;
       const slug = req.params.slug;
 
       const chats = await prisma.room.findUnique({
         where: {
           slug,
-          adminId,
         },
         include: {
           shapes: true,

@@ -44,13 +44,16 @@ export class Redis {
   ) {
     try {
       console.log("in the subscribeAndSend");
+      console.log(roomSlug, users);
       const client = await Redis.getSubscriberClient();
 
       if (!subscribedRooms.has(roomSlug)) {
         subscribedRooms.add(roomSlug);
-        await client.subscribe(`shapes:${roomSlug}`, (message) => {
+        await client.subscribe(`shapes:${roomSlug}`, (message: string) => {
+          console.log("Raw Redis message:", message);
           users.forEach((u) => {
-            if (u.ws === ws && u.roomSlug === roomSlug) {
+            if (u.ws !== ws && u.roomSlug === roomSlug) {
+              console.log(`Sending to user in room ${roomSlug}`);
               u.ws.send(
                 JSON.stringify({
                   type: "shapes",
@@ -92,6 +95,7 @@ export class Redis {
     try {
       console.log("in the putShapesInQueue");
       const redis = await Redis.getCommandClient();
+      console.log(message);
       await redis.lPush(
         Redis.shapesQueueKey,
         JSON.stringify({ roomSlug, message, userId })
@@ -110,15 +114,17 @@ export class Redis {
   ) {
     try {
       const client = await Redis.getCommandClient();
-
+      console.log("in the pickupShapesAndPutInDb");
       while (true) {
         const result = await client.brPop(Redis.shapesQueueKey, 0);
         if (result) {
           const data = JSON.parse(result.element);
 
+          console.log(data);
+
           await handler(data);
 
-          await client.publish(`shapes:${data.roomSlug}`, JSON.stringify(data));
+          await client.publish(`shapes:${data.roomSlug}`, data.message);
         }
       }
     } catch (e) {

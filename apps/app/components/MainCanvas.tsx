@@ -2,38 +2,33 @@
 
 import React, { useEffect, useState } from "react";
 import Canvas from "./Canvas";
+import { WS_URL } from "@/lib/utils";
 
 const MainCanvas = ({ roomSlug }: { roomSlug: string }) => {
   const [socket, setSocket] = useState<WebSocket>();
 
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   const ws = new WebSocket(`http://localhost:8080?token${token}`);
-  //   ws.onopen = () => {
-  //     ws.send(
-  //       JSON.stringify({
-  //         type: "join_room",
-  //         payload: JSON.stringify({ roomSlug }),
-  //       })
-  //     );
-  //     setSocket(ws);
-  //   };
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return;
+    }
+    const ws = new WebSocket(`${WS_URL}?token=${token.split("Bearer ")[1]}`);
+    ws.onopen = () => {
+      ws.send(
+        JSON.stringify({
+          type: "join_room",
+          payload: { roomSlug },
+        })
+      );
+      setSocket(ws);
+    };
+  }, [roomSlug]);
 
-  //   return () => {
-  //     ws.send(
-  //       JSON.stringify({
-  //         type: "leave_room",
-  //       })
-  //     );
-  //     ws.close();
-  //   };
-  // }, [roomSlug]);
+  if (!socket) {
+    return <div>connecting to server...</div>;
+  }
 
-  // if (!socket) {
-  //   return <div>connecting to server...</div>;
-  // }
-
-  return <Canvas socket={socket!} roomSlug={roomSlug} />;
+  return <Canvas socket={socket} roomSlug={roomSlug} />;
 };
 
 export default MainCanvas;

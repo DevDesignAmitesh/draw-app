@@ -62,19 +62,49 @@ export class Draw {
     this.startY = 0;
     this.currentX = 0;
     this.currentY = 0;
-    this.startHandler();
     this.renderAllShapes();
+    this.loadAllShapes(roomSlug);
+    this.webSockerInitHandler();
+    this.startHandler();
     this.startCanvasHandler();
     this.toolReact = setSelectedTools;
   }
 
-  // public loadAllShapes = async (slug: string) => {
-  //   try {
-  //     this.existingShapes = await getAllShapes(slug);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+  public loadAllShapes = async (slug: string) => {
+    try {
+      const data = await getAllShapes(slug);
+      console.log(data);
+      this.existingShapes = await getAllShapes(slug);
+      this.renderAllShapes();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  public webSockerInitHandler = () => {
+    console.log("Initializing WebSocket handler for room:", this.roomSlug);
+
+    this.ws.onmessage = (event) => {
+      console.log("Received WebSocket message:", event.data);
+      const data = JSON.parse(event.data);
+      console.log("Parsed message:", data);
+
+      const shapes = JSON.parse(data.message);
+
+      this.existingShapes.push(shapes);
+
+      this.renderAllShapes();
+    };
+  };
+
+  public sendMessageViaWebSocket = (shape: Shapes) => {
+    const message = {
+      type: "shapes",
+      payload: { message: JSON.stringify(shape), roomSlug: this.roomSlug },
+    };
+    console.log("Sending message:", message);
+    this.ws.send(JSON.stringify(message));
+  };
 
   public changeTheme(theme: string) {
     const themeColor = theme === "dark" ? "#fff" : "#000";
@@ -237,6 +267,7 @@ export class Draw {
         fillColor: currentBg!,
       };
       this.existingShapes.push(shape);
+      this.sendMessageViaWebSocket(shape);
     }
 
     if (this.selectedTools === "circle") {
@@ -255,6 +286,7 @@ export class Draw {
         fillColor: currentBg!,
       };
       this.existingShapes.push(shape);
+      this.sendMessageViaWebSocket(shape);
     }
 
     if (this.selectedTools === "line") {
@@ -271,6 +303,7 @@ export class Draw {
         fillColor: currentBg!,
       };
       this.existingShapes.push(shape);
+      this.sendMessageViaWebSocket(shape);
     }
 
     if (this.selectedTools === "triangle") {
@@ -297,6 +330,7 @@ export class Draw {
       };
 
       this.existingShapes.push(shape);
+      this.sendMessageViaWebSocket(shape);
     }
 
     this.toolReact("hand");
@@ -443,7 +477,6 @@ export class Draw {
           //yaha prr sidebar to false krna hai
         } else {
           // Deselect others - restore their original colors
-          console.log(result.item);
           this.existingShapes.forEach((shape, index) => {
             if (index !== result.index && this.originalColors.has(index)) {
               const originalColor =
@@ -451,7 +484,6 @@ export class Draw {
               shape.strokeColor = originalColor;
               this.originalColors.delete(index);
               // yaha ppr maybe sidebar true krna hai
-              console.log(true);
             }
           });
 
