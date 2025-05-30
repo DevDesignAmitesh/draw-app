@@ -30,7 +30,7 @@ model Room {
   id      String @id @default(uuid())
   name    String
   slug    String @unique
-  adminId String @unique
+  adminId String
   user    User   @relation(fields: [adminId], references: [id])
 
   shapes Shapes[]

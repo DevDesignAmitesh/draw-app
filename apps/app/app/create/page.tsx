@@ -1,10 +1,13 @@
-import CreateRoom from '@/components/CreateRoom'
-import React from 'react'
+import CreateRoom from "@/components/CreateRoom";
+import ProtectedRoute from "@/context/ProtectedRoute";
+import React from "react";
 
 const page = () => {
   return (
-    <CreateRoom />
-  )
-}
+    <ProtectedRoute>
+      <CreateRoom />
+    </ProtectedRoute>
+  );
+};
 
-export default page
+export default page;

@@ -351,11 +351,11 @@ export function getSelectedShapeDistance({
 }
 
 export interface FormDataTypes {
-  strokeColor: string | null;
-  bgColor: string | null;
-  strokeWidth: number | null;
-  strokeStyle: string | null;
-  opacity: number | null;
+  strokeColor?: string | null;
+  bgColor?: string | null;
+  strokeWidth?: number | null;
+  strokeStyle?: string | null;
+  opacity?: number | null;
 }
 
 export const HTTP_URL = "http://localhost:5000/api/v1";

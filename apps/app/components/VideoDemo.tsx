@@ -2,9 +2,9 @@ import React from "react";
 
 const VideoDemo = () => {
   return (
-    <section id="demo" className="py-24 px-4 w-full">
+    <section id="demo" className="lg:py-24 py-0 px-4 w-full">
       <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-3xl font-bold mb-12 text-black dark:text-white">
+        <h2 className="lg:text-3xl text-2xl font-bold lg:mb-12 mb-6 text-black dark:text-white">
           See How It Works
         </h2>
         <div className="aspect-video relative group cursor-pointer">

@@ -10,7 +10,7 @@ const Footer = () => {
         © 2025 drawing app. All rights reserved.
       </p>
       <div className="flex justify-center items-center gap-4 text-neutral-600 dark:text-neutral-400">
-        <p className="capitalize font-medium">developed by</p>
+        <p className="capitalize font-medium lg:block hidden">developed by</p>
         <div className="flex justify-center items-center gap-2">
           <Link
             href="https://www.linkedin.com/in/amitesh-singh-504b2b281/"

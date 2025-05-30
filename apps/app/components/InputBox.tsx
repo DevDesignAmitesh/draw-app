@@ -27,7 +27,7 @@ const InputBox = ({
         type={type}
         value={value}
         placeholder={`enter ${label}`}
-        className="w-full p-2 text-[15px] rounded-md capitalize border border-neutral-600 dark:border-neutral-300 placeholder:text-neutral-600 dark:placeholder:text-neutral-300 text-neutral-600 dark:text-neutral-300 outline-none"
+        className="w-full p-2 text-[15px] rounded-md border border-neutral-600 dark:border-neutral-300 placeholder:text-neutral-600 dark:placeholder:text-neutral-300 text-neutral-600 dark:text-neutral-300 outline-none"
       />
     </div>
   );

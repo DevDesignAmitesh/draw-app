@@ -26,16 +26,26 @@ const CreateRoom = () => {
     }
     try {
       setLoading(true);
-      const res = await axios.post(`${HTTP_URL}/create-room`, {
-        name: roomName,
-        slug: roomUrl,
-      });
+      const res = await axios.post(
+        `${HTTP_URL}/create-room`,
+        {
+          name: roomName,
+          slug: roomUrl,
+        },
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
 
-      if (res.status === 201) {
+      console.log(res)
+
+      if (res.status === 200) {
         router.push(`/canvas/${res.data.slug}`);
       }
     } catch (err: any) {
-      alert(err?.response?.data?.message || "Room creation failed. Try again.");
+      alert("Room creation failed. Try again.");
     } finally {
       setLoading(false);
     }
@@ -59,7 +69,7 @@ const CreateRoom = () => {
         <SuperBtn
           variant="primary"
           className="w-full mt-2"
-          label={"create board"}
+          label={loading ? "processing.." : "create board"}
           disabled={loading}
           onClick={handleRoomCreation}
         />

@@ -20,20 +20,20 @@ const Canvas = ({
 }) => {
   const [draw, setDraw] = useState<Draw>();
   const [selectedTools, setSelectedTools] = useState<selectedTools>("hand");
+  const [sideBar, setSideBar] = useState<boolean>(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const { theme } = useContext(ThemeContext);
 
   const [details, setDetails] = useState<FormDataTypes>({
     strokeColor: theme === "dark" ? "#fff" : "#000",
-    bgColor: "#000",
+    bgColor: theme === "dark" ? "#121212" : "#fff",
     strokeWidth: 2,
     strokeStyle: "solid",
-    opacity: 100,
+    opacity: 1,
   });
 
   useEffect(() => {
-    console.log(theme);
     if (canvasRef.current) {
       const draw = new Draw(
         canvasRef.current,
@@ -41,7 +41,9 @@ const Canvas = ({
         roomSlug,
         setSelectedTools,
         theme,
-        details
+        details,
+        setDetails,
+        setSideBar
       );
       setDraw(draw);
 
@@ -59,7 +61,6 @@ const Canvas = ({
 
   useEffect(() => {
     if (draw) {
-      console.log("run");
       draw.changeTheme(theme);
     }
   }, [theme]);
@@ -126,7 +127,7 @@ const Canvas = ({
         })}
       </div>
 
-      <SideBar details={details} setDetails={setDetails} />
+      {sideBar && <SideBar details={details} setDetails={setDetails} />}
 
       <canvas ref={canvasRef} />
     </div>

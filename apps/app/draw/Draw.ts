@@ -4,6 +4,7 @@ import {
   selectedTools,
   Shapes,
 } from "@/lib/utils";
+import { getAllShapes } from "./http";
 
 export class Draw {
   private ws: WebSocket;
@@ -25,6 +26,10 @@ export class Draw {
   public strokeColor: string | null;
   public details: FormDataTypes;
   private originalColors: Map<number, string> = new Map();
+  private setDetails: React.Dispatch<React.SetStateAction<FormDataTypes>>;
+  private setSideBar: React.Dispatch<React.SetStateAction<boolean>>;
+  private opacity: number;
+  private fillColor: string | null;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -32,12 +37,18 @@ export class Draw {
     roomSlug: string,
     setSelectedTools: React.Dispatch<React.SetStateAction<selectedTools>>,
     theme: string,
-    details: FormDataTypes
+    details: FormDataTypes,
+    setDetails: React.Dispatch<React.SetStateAction<FormDataTypes>>,
+    setSideBar: React.Dispatch<React.SetStateAction<boolean>>
   ) {
     this.details = details;
+    this.setDetails = setDetails;
+    this.setSideBar = setSideBar;
     this.strokeColor = theme === "dark" ? "#fff" : "#000";
     this.strokeWidth = 2;
     this.strokeStyle = "solid";
+    this.fillColor = theme === "dark" ? "#232329" : "#fff";
+    this.opacity = 1;
     this.existingShapes = [];
     this.undoShapes = [];
     this.selectedId = null;
@@ -57,12 +68,27 @@ export class Draw {
     this.toolReact = setSelectedTools;
   }
 
+  // public loadAllShapes = async (slug: string) => {
+  //   try {
+  //     this.existingShapes = await getAllShapes(slug);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
   public changeTheme(theme: string) {
-    this.strokeColor = theme === "dark" ? "#fff" : "#000";
+    const themeColor = theme === "dark" ? "#fff" : "#000";
+
+    if (this.strokeColor === "#000" || this.strokeColor === "#fff") {
+      this.strokeColor = themeColor;
+    }
 
     this.existingShapes.forEach((item, index) => {
+      const originalColor = item.strokeColor;
       if (!this.originalColors.has(index)) {
-        item.strokeColor = this.strokeColor!;
+        if (originalColor === "#000" || originalColor === "#fff") {
+          item.strokeColor = this.strokeColor!;
+        }
       }
     });
 
@@ -76,10 +102,14 @@ export class Draw {
       const newColor = data.strokeColor ?? selectedShape.strokeColor;
       const newWidth = data.strokeWidth ?? selectedShape.width;
       const newStyle = data.strokeStyle ?? selectedShape.strokeStyle;
+      const newOpacity = data.opacity ?? selectedShape.opacity;
+      const newBg = data.bgColor ?? selectedShape.fillColor;
 
       selectedShape.strokeColor = newColor;
       selectedShape.width = newWidth;
       selectedShape.strokeStyle = newStyle;
+      selectedShape.opacity = newOpacity;
+      selectedShape.fillColor = newBg;
 
       this.originalColors.set(this.selectedId, newColor);
 
@@ -89,13 +119,16 @@ export class Draw {
     this.strokeColor = data.strokeColor ?? this.strokeColor;
     this.strokeWidth = data.strokeWidth ?? this.strokeWidth;
     this.strokeStyle = data.strokeStyle ?? this.strokeStyle;
+    this.opacity = data.opacity ?? this.opacity;
+    this.fillColor = data.bgColor ?? this.fillColor;
 
     this.renderAllShapes();
   }
 
   public renderAllShapes = () => {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.existingShapes.map((item, index) => {
+    this.existingShapes.map((item) => {
+      this.context.globalAlpha = item.opacity;
       this.context.beginPath();
 
       if (item.strokeStyle === "solid") {
@@ -105,8 +138,6 @@ export class Draw {
       } else if (item.strokeStyle === "dashed") {
         this.context.setLineDash([10, 5]);
       }
-
-      this.context.strokeStyle = item.strokeColor;
       this.context.lineWidth = item.width;
 
       if (item.type === "square") {
@@ -119,16 +150,29 @@ export class Draw {
         this.drawTriangle(item);
       }
 
+      if (item.fillColor) {
+        this.context.fillStyle = item.fillColor!;
+        this.context.fill();
+      }
+
+      this.context.strokeStyle = item.strokeColor;
       this.context.stroke();
+
       this.context.closePath();
+
+      this.context.globalAlpha = 1;
     });
   };
 
   public changeSelectedTool = (tool: selectedTools) => {
     this.selectedTools = tool;
+    this.selectedId = null;
+    this.setSideBar(false);
     if (this.details.strokeColor) this.strokeColor = this.details.strokeColor;
     if (this.details.strokeWidth) this.strokeWidth = this.details.strokeWidth;
     if (this.details.strokeStyle) this.strokeStyle = this.details.strokeStyle;
+    if (this.details.opacity) this.opacity = this.details.opacity;
+    if (this.details.bgColor) this.fillColor = this.details.bgColor;
   };
 
   private startHandler = () => {
@@ -155,11 +199,16 @@ export class Draw {
     this.canvas.removeEventListener("click", this.mouseClickHandler);
   };
 
-  private mouseDownHandler = (e: MouseEvent) => {
+  private mouseDownHandler = (e: MouseEvent | TouchEvent) => {
     this.isDrawing = true;
     let rect = this.canvas.getBoundingClientRect();
-    this.startX = e.clientX - rect.left;
-    this.startY = e.clientY - rect.top;
+    if ("touches" in e) {
+      this.startX = e.touches[0].clientX - rect.left;
+      this.startY = e.touches[0].clientY - rect.top;
+    } else {
+      this.startX = e.clientX - rect.left;
+      this.startY = e.clientY - rect.top;
+    }
   };
 
   private mouseUpHandler = () => {
@@ -169,6 +218,8 @@ export class Draw {
     const currentStrokeColor = this.details.strokeColor || this.strokeColor!;
     const currentStrokeWidth = this.details.strokeWidth || this.strokeWidth;
     const currentStrokeStyle = this.details.strokeStyle || this.strokeStyle;
+    const currentOpacity = this.details.opacity || this.opacity;
+    const currentBg = this.details.bgColor || this.fillColor;
 
     if (this.selectedTools === "square") {
       let w = this.currentX - this.startX;
@@ -180,9 +231,10 @@ export class Draw {
         w,
         h,
         width: currentStrokeWidth,
-        opacity: 100,
+        opacity: currentOpacity,
         strokeColor: currentStrokeColor,
         strokeStyle: currentStrokeStyle,
+        fillColor: currentBg!,
       };
       this.existingShapes.push(shape);
     }
@@ -197,9 +249,10 @@ export class Draw {
         y: this.startY,
         r,
         width: currentStrokeWidth,
-        opacity: 100,
+        opacity: currentOpacity,
         strokeColor: currentStrokeColor,
         strokeStyle: currentStrokeStyle,
+        fillColor: currentBg!,
       };
       this.existingShapes.push(shape);
     }
@@ -212,9 +265,10 @@ export class Draw {
         cx: this.currentX,
         cY: this.currentY,
         width: currentStrokeWidth,
-        opacity: 100,
+        opacity: currentOpacity,
         strokeColor: currentStrokeColor,
         strokeStyle: currentStrokeStyle,
+        fillColor: currentBg!,
       };
       this.existingShapes.push(shape);
     }
@@ -236,9 +290,10 @@ export class Draw {
         x3,
         y3,
         width: currentStrokeWidth,
-        opacity: 100,
+        opacity: currentOpacity,
         strokeColor: currentStrokeColor,
         strokeStyle: currentStrokeStyle,
+        fillColor: currentBg!,
       };
 
       this.existingShapes.push(shape);
@@ -247,14 +302,22 @@ export class Draw {
     this.toolReact("hand");
   };
 
-  private mouseMoveHandler = (e: MouseEvent) => {
+  private mouseMoveHandler = (e: MouseEvent | TouchEvent) => {
     if (this.isDrawing) {
       let rect = this.canvas.getBoundingClientRect();
-      this.currentX = e.clientX - rect.left;
-      this.currentY = e.clientY - rect.top;
+      if ("touches" in e) {
+        this.currentX = e.touches[0].clientX - rect.left;
+        this.currentY = e.touches[0].clientY - rect.top;
+      } else {
+        this.currentX = e.clientX - rect.left;
+        this.currentY = e.clientY - rect.top;
+      }
 
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.renderAllShapes();
+
+      const currentOpacity = this.details.opacity || this.opacity;
+      this.context.globalAlpha = currentOpacity;
 
       this.context.beginPath();
 
@@ -262,6 +325,7 @@ export class Draw {
       const currentStrokeStyle = this.details.strokeStyle || this.strokeStyle;
       const currentStrokeColor = this.details.strokeColor || this.strokeColor!;
       const currentStrokeWidth = this.details.strokeWidth || this.strokeWidth;
+      const currentBg = this.details.bgColor || this.fillColor;
 
       if (currentStrokeStyle === "solid") {
         this.context.setLineDash([]);
@@ -270,8 +334,6 @@ export class Draw {
       } else if (currentStrokeStyle === "dashed") {
         this.context.setLineDash([10, 5]);
       }
-
-      this.context.strokeStyle = currentStrokeColor;
       this.context.lineWidth = currentStrokeWidth;
 
       if (this.selectedTools === "square") {
@@ -291,10 +353,6 @@ export class Draw {
       }
 
       if (this.selectedTools === "eraser") {
-        const rect = this.canvas.getBoundingClientRect();
-        this.currentX = e.clientX - rect.left;
-        this.currentY = e.clientY - rect.top;
-
         const result = getSelectedShapeDistance({
           existingShapes: this.existingShapes,
           currentX: this.currentX,
@@ -310,8 +368,17 @@ export class Draw {
         }
       }
 
+      if (currentBg) {
+        this.context.fillStyle = currentBg!;
+        this.context.fill();
+      }
+
+      this.context.strokeStyle = currentStrokeColor;
       this.context.stroke();
+
       this.context.closePath();
+
+      this.context.globalAlpha = 1;
 
       if (this.selectedId !== null) {
         if (this.selectedTools === "hand") {
@@ -337,11 +404,16 @@ export class Draw {
     }
   };
 
-  private mouseClickHandler = (e: MouseEvent) => {
+  private mouseClickHandler = (e: MouseEvent | TouchEvent) => {
     if (this.selectedTools === "hand") {
       const rect = this.canvas.getBoundingClientRect();
-      this.currentX = e.clientX - rect.left;
-      this.currentY = e.clientY - rect.top;
+      if ("touches" in e) {
+        this.currentX = e.touches[0].clientX - rect.left;
+        this.currentY = e.touches[0].clientY - rect.top;
+      } else {
+        this.currentX = e.clientX - rect.left;
+        this.currentY = e.clientY - rect.top;
+      }
 
       const result = getSelectedShapeDistance({
         existingShapes: this.existingShapes,
@@ -349,8 +421,17 @@ export class Draw {
         currentY: this.currentY,
       });
 
+      this.setSideBar(result.found);
+
       if (result.distance === 0) {
         result.found = true;
+        this.setDetails(() => ({
+          strokeColor: result.item.strokeColor,
+          strokeWidth: result.item.width,
+          strokeStyle: result.item.strokeStyle,
+          opacity: result.item.opacity,
+          bgColor: result.item.fillColor,
+        }));
 
         if (this.selectedId === result.index) {
           // Deselect - restore original color
@@ -359,14 +440,18 @@ export class Draw {
           result.item.strokeColor = originalColor;
           this.originalColors.delete(result.index!);
           this.selectedId = null;
+          //yaha prr sidebar to false krna hai
         } else {
           // Deselect others - restore their original colors
+          console.log(result.item);
           this.existingShapes.forEach((shape, index) => {
             if (index !== result.index && this.originalColors.has(index)) {
               const originalColor =
                 this.originalColors.get(index) || this.strokeColor!;
               shape.strokeColor = originalColor;
               this.originalColors.delete(index);
+              // yaha ppr maybe sidebar true krna hai
+              console.log(true);
             }
           });
 

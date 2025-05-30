@@ -28,12 +28,14 @@ const AuthScreen = ({ isSignin }: { isSignin?: boolean }) => {
         password,
       });
 
+      console.log(res);
+
       if (res.status === 201) {
-        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("token", `Bearer ${res.data.token}`);
         router.push("/dashboard");
       }
-    } catch (err: any) {
-      alert(err?.response?.data?.message || "Sign-in failed. Try again.");
+    } catch (err) {
+      alert("Sign-in failed. Try again.");
     } finally {
       setLoading(false);
     }
@@ -55,8 +57,8 @@ const AuthScreen = ({ isSignin }: { isSignin?: boolean }) => {
       if (res.status === 201) {
         await handleSignin();
       }
-    } catch (err: any) {
-      alert(err?.response?.data?.message || "Sign-up failed. Try again.");
+    } catch (err) {
+      alert("Sign-up failed. Try again.");
       setLoading(false);
     }
   };
@@ -79,7 +81,7 @@ const AuthScreen = ({ isSignin }: { isSignin?: boolean }) => {
       <p className="text-[15px] mt-2 text-center text-neutral-600 dark:text-neutral-300">
         {subText}
       </p>
-      <div className="p-5 rounded-md border-2 border-neutral-600 dark:border-neutral-300 w-[450px] mt-4 flex flex-col justify-center items-center gap-4">
+      <div className="p-5 rounded-md border-2 border-neutral-600 dark:border-neutral-300 lg:w-[450px] w-[350px] mt-4 flex flex-col justify-center items-center gap-4">
         {!isSignin && (
           <InputBox
             value={name}

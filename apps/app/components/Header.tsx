@@ -8,9 +8,8 @@ import { useAuthContext } from "@/context/AuthContext";
 
 const Header = () => {
   const { authenticated } = useAuthContext();
-  console.log(authenticated);
   return (
-    <div className="w-full py-5 bg-white dark:bg-[#121212] text-black dark:text-white px-20 flex justify-between items-center">
+    <div className="w-full py-5 bg-white dark:bg-[#121212] text-black dark:text-white lg:px-20 px-10 flex justify-between items-center">
       {authenticated ? (
         <div className="flex flex-col justify-center items-start gap-1">
           <h1 className="text-3xl font-bold capitalize dark:text-white text-black">
@@ -23,12 +22,16 @@ const Header = () => {
       ) : (
         <h1 className="text-2xl font-bold capitalize">drawing app</h1>
       )}
-      <div className="flex justify-between items-center gap-4">
+      <div className="flex justify-between items-center lg:gap-4 gap-1">
         <ToggleBtn />
         {authenticated ? (
           <>
             <Link href={"/"}>
-              <SuperBtn label="log out" variant={"primary"} />
+              <SuperBtn
+                label="log out"
+                variant={"primary"}
+                className="lg:block hidden"
+              />
             </Link>
             <Link href={"/create"}>
               <SuperBtn label="create new room" variant="primary" />
@@ -37,10 +40,25 @@ const Header = () => {
         ) : (
           <>
             <Link href={"/signin"}>
-              <SuperBtn label="sign in" variant={"primary"} />
+              <SuperBtn
+                label="sign in"
+                variant={"primary"}
+                className="lg:block hidden"
+              />
             </Link>
             <Link href={"/signup"}>
-              <SuperBtn label="sign up" variant={"secondary"} />
+              <SuperBtn
+                label="sign up"
+                variant={"secondary"}
+                className="lg:block hidden"
+              />
+            </Link>
+            <Link href={"/signup"}>
+              <SuperBtn
+                label="get started"
+                variant={"secondary"}
+                className="lg:hidden block"
+              />
             </Link>
           </>
         )}

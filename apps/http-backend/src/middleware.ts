@@ -20,6 +20,8 @@ export function middleware(req: Request, res: Response, next: NextFunction) {
       decoded = verify(bearerToken, process.env.JWT_SECRET!);
     }
 
+    console.log(bearerToken);
+    console.log(token);
     (req as JwtPayload).user = decoded;
     next();
   } catch (error) {

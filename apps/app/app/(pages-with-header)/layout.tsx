@@ -8,7 +8,7 @@ export default function Layout({
   return (
     <>
       <Header />
-      <div className="px-20">{children}</div>
+      <div className="lg:px-20 px-10">{children}</div>
     </>
   );
 }

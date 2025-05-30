@@ -3,7 +3,7 @@ import React from "react";
 import ToggleBtn from "./ToggleBtn";
 
 const strokeColors = ["#E0E0E0", "#F87171", "#6EE7B7", "#FACC15", "#FB923C"];
-const bgColors = ["#1F2937", "#7C3AED", "#10B981", "#F59E0B", "#111827"];
+const bgColors = ["#121212", "#fff", "#10B981", "#F59E0B", "#111827"];
 const strokeWidths = [2, 4, 6];
 const strokeStyles = ["solid", "dashed", "dotted"];
 
@@ -96,7 +96,8 @@ const SideBar = ({
         <input
           type="range"
           min={0}
-          max={100}
+          max={1}
+          step={0.01}
           value={details.opacity ?? 0}
           onChange={(e) =>
             setDetails({ ...details, opacity: Number(e.target.value) })

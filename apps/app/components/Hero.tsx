@@ -5,28 +5,41 @@ import SuperBtn from "./SuperBtn";
 import Image from "next/image";
 import { ThemeContext } from "@/lib/ThemeProvider";
 import Link from "next/link";
+import { useAuthContext } from "@/context/AuthContext";
 
 const Hero = () => {
   const { theme } = useContext(ThemeContext);
+  const { authenticated } = useAuthContext();
+  console.log(authenticated);
 
   return (
-    <div className="w-full py-10 pt-24 flex justify-between items-center gap-10">
+    <div className="w-full py-10 lg:pt-24 pt-14 flex lg:flex-row flex-col justify-center lg:justify-between items-center gap-10">
       <div className="flex flex-col justify-center items-start">
-        <h1 className="text-6xl text-left capitalize font-bold text-black dark:text-white">
+        <h1 className="lg:text-6xl text-4xl text-left capitalize font-bold text-black dark:text-white">
           Virtual whiteboard for collaborative drawing
         </h1>
-        <p className="text-[16px] font-medium capitalize text-left text-neutral-600 dark:text-neutral-400 mt-3">
+        <p className="lg:text-[16px] text-[14px] font-medium capitalize text-left text-neutral-600 dark:text-neutral-400 mt-3">
           Create beautiful diagrams, flowcharts, and sketches with a minimalist,
           intuitive interface. Just like Excalidraw, but built by you.
         </p>
-        <div className="flex justify-center items-center gap-4 mt-8">
-          <Link href={"/signup"}>
-            <SuperBtn label="get started" variant="secondary" />
+        {!authenticated ? (
+          <div className="flex justify-center items-center gap-4 lg:mt-8 mt-4">
+            <Link href={"/signup"}>
+              <SuperBtn label="get started" variant="secondary" />
+            </Link>
+            <Link href={"#demo"}>
+              <SuperBtn label="watch demo" variant="primary" />
+            </Link>
+          </div>
+        ) : (
+          <Link href={"/dashboard"}>
+            <SuperBtn
+              label="start sketching"
+              variant="secondary"
+              className="lg:mt-8 mt-4"
+            />
           </Link>
-          <Link href={"#demo"}>
-            <SuperBtn label="watch demo" variant="primary" />
-          </Link>
-        </div>
+        )}
       </div>
       {theme === "dark" ? (
         <Image
