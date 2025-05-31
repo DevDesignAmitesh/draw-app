@@ -39,7 +39,6 @@ const Canvas = ({
         canvasRef.current,
         socket,
         roomSlug,
-        setSelectedTools,
         theme,
         details,
         setDetails,

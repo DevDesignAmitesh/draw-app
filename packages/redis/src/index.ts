@@ -43,17 +43,13 @@ export class Redis {
     users: usersProps[]
   ) {
     try {
-      console.log("in the subscribeAndSend");
-      console.log(roomSlug, users);
       const client = await Redis.getSubscriberClient();
 
       if (!subscribedRooms.has(roomSlug)) {
         subscribedRooms.add(roomSlug);
         await client.subscribe(`shapes:${roomSlug}`, (message: string) => {
-          console.log("Raw Redis message:", message);
           users.forEach((u) => {
-            if (u.ws !== ws && u.roomSlug === roomSlug) {
-              console.log(`Sending to user in room ${roomSlug}`);
+            if (u.roomSlug === roomSlug) {
               u.ws.send(
                 JSON.stringify({
                   type: "shapes",
@@ -76,7 +72,6 @@ export class Redis {
       console.log("error is subscribeAndSend: " + error);
     }
   }
-
   public static async unSubscribe(roomSlug: string) {
     try {
       const client = await Redis.getSubscriberClient();

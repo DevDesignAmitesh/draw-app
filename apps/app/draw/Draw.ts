@@ -20,7 +20,6 @@ export class Draw {
   private selectedId: number | null;
   public existingShapes: Shapes[];
   public undoShapes: Shapes[];
-  private toolReact: (e: selectedTools) => void;
   public strokeWidth: number;
   public strokeStyle: string;
   public strokeColor: string | null;
@@ -35,7 +34,6 @@ export class Draw {
     canvas: HTMLCanvasElement,
     ws: WebSocket,
     roomSlug: string,
-    setSelectedTools: React.Dispatch<React.SetStateAction<selectedTools>>,
     theme: string,
     details: FormDataTypes,
     setDetails: React.Dispatch<React.SetStateAction<FormDataTypes>>,
@@ -67,13 +65,10 @@ export class Draw {
     this.webSockerInitHandler();
     this.startHandler();
     this.startCanvasHandler();
-    this.toolReact = setSelectedTools;
   }
 
   public loadAllShapes = async (slug: string) => {
     try {
-      const data = await getAllShapes(slug);
-      console.log(data);
       this.existingShapes = await getAllShapes(slug);
       this.renderAllShapes();
     } catch (error) {
@@ -82,17 +77,13 @@ export class Draw {
   };
 
   public webSockerInitHandler = () => {
-    console.log("Initializing WebSocket handler for room:", this.roomSlug);
-
     this.ws.onmessage = (event) => {
-      console.log("Received WebSocket message:", event.data);
       const data = JSON.parse(event.data);
-      console.log("Parsed message:", data);
-
       const shapes = JSON.parse(data.message);
-
+      console.log("hello");
+      console.log(shapes);
+      console.log("hello");
       this.existingShapes.push(shapes);
-
       this.renderAllShapes();
     };
   };
@@ -102,7 +93,6 @@ export class Draw {
       type: "shapes",
       payload: { message: JSON.stringify(shape), roomSlug: this.roomSlug },
     };
-    console.log("Sending message:", message);
     this.ws.send(JSON.stringify(message));
   };
 
@@ -332,8 +322,6 @@ export class Draw {
       this.existingShapes.push(shape);
       this.sendMessageViaWebSocket(shape);
     }
-
-    this.toolReact("hand");
   };
 
   private mouseMoveHandler = (e: MouseEvent | TouchEvent) => {
@@ -355,7 +343,6 @@ export class Draw {
 
       this.context.beginPath();
 
-      // Use current properties for preview
       const currentStrokeStyle = this.details.strokeStyle || this.strokeStyle;
       const currentStrokeColor = this.details.strokeColor || this.strokeColor!;
       const currentStrokeWidth = this.details.strokeWidth || this.strokeWidth;
@@ -397,7 +384,6 @@ export class Draw {
           const last = this.existingShapes[result.index];
           this.existingShapes.splice(result.index, 1);
           this.undoShapes.push(last);
-          // Clean up originalColors map
           this.originalColors.delete(result.index);
         }
       }
@@ -455,12 +441,14 @@ export class Draw {
         currentY: this.currentY,
       });
 
-      this.setSideBar(result.found);
+      let shouldShowSidebar = false;
 
-      if (result.distance === 0) {
-        result.found = true;
+      if (result.distance === 0 && result.index !== null) {
+        const originalColor =
+          this.originalColors.get(result.index) || result.item.strokeColor;
+
         this.setDetails(() => ({
-          strokeColor: result.item.strokeColor,
+          strokeColor: originalColor,
           strokeWidth: result.item.width,
           strokeStyle: result.item.strokeStyle,
           opacity: result.item.opacity,
@@ -468,34 +456,29 @@ export class Draw {
         }));
 
         if (this.selectedId === result.index) {
-          // Deselect - restore original color
-          const originalColor =
-            this.originalColors.get(result.index!) || this.strokeColor!;
           result.item.strokeColor = originalColor;
-          this.originalColors.delete(result.index!);
+          this.originalColors.delete(result.index);
           this.selectedId = null;
-          //yaha prr sidebar to false krna hai
+          shouldShowSidebar = false;
         } else {
-          // Deselect others - restore their original colors
           this.existingShapes.forEach((shape, index) => {
             if (index !== result.index && this.originalColors.has(index)) {
-              const originalColor =
+              const prevOriginalColor =
                 this.originalColors.get(index) || this.strokeColor!;
-              shape.strokeColor = originalColor;
+              shape.strokeColor = prevOriginalColor;
               this.originalColors.delete(index);
-              // yaha ppr maybe sidebar true krna hai
             }
           });
 
-          // Select new shape - store its current color and make it red
-          this.originalColors.set(result.index!, result.item.strokeColor);
+          if (!this.originalColors.has(result.index)) {
+            this.originalColors.set(result.index, result.item.strokeColor);
+          }
+
           result.item.strokeColor = "red";
           this.selectedId = result.index;
+          shouldShowSidebar = true;
         }
-      }
-
-      if (!result.found) {
-        // Deselect all - restore all original colors
+      } else {
         this.existingShapes.forEach((shape, index) => {
           if (this.originalColors.has(index)) {
             const originalColor =
@@ -505,8 +488,10 @@ export class Draw {
         });
         this.originalColors.clear();
         this.selectedId = null;
+        shouldShowSidebar = false;
       }
 
+      this.setSideBar(shouldShowSidebar);
       this.renderAllShapes();
     }
   };
@@ -585,7 +570,6 @@ export class Draw {
     let last = this.existingShapes.pop()!;
     this.undoShapes.push(last);
 
-    // Clean up selection if the undone shape was selected
     if (this.selectedId === this.existingShapes.length) {
       this.selectedId = null;
       this.originalColors.clear();
