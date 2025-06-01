@@ -149,3 +149,13 @@ v1Router.get(
     }
   }
 );
+
+v1Router.get("/who", middleware, (req: Request, res: Response): any => {
+  try {
+    const decoded = (req as JwtPayload).user;
+    return res.status(201).json({ message: decoded });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ message: "something went wrong" });
+  }
+});

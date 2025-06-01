@@ -47,15 +47,37 @@ export class Redis {
 
       if (!subscribedRooms.has(roomSlug)) {
         subscribedRooms.add(roomSlug);
-        await client.subscribe(`shapes:${roomSlug}`, (message: string) => {
+        await client.subscribe(`shapes:${roomSlug}`, (data: any) => {
+          const parsedMessage: any = JSON.parse(data);
           users.forEach((u) => {
             if (u.roomSlug === roomSlug) {
-              u.ws.send(
-                JSON.stringify({
-                  type: "shapes",
-                  message,
-                })
-              );
+              if (parsedMessage.type === "shapes") {
+                u.ws.send(
+                  JSON.stringify({
+                    type: "shapes",
+                    message: parsedMessage.message,
+                    userId: u.userId,
+                  })
+                );
+              }
+              if (parsedMessage.type === "delete_shape") {
+                u.ws.send(
+                  JSON.stringify({
+                    type: "delete_shape",
+                    message: parsedMessage.message,
+                    userId: u.userId,
+                  })
+                );
+              }
+              if (parsedMessage.type === "update_shape") {
+                u.ws.send(
+                  JSON.stringify({
+                    type: "update_shape",
+                    message: parsedMessage.message,
+                    userId: u.userId,
+                  })
+                );
+              }
             }
           });
         });
@@ -72,6 +94,7 @@ export class Redis {
       console.log("error is subscribeAndSend: " + error);
     }
   }
+
   public static async unSubscribe(roomSlug: string) {
     try {
       const client = await Redis.getSubscriberClient();
@@ -85,7 +108,8 @@ export class Redis {
   public static async putShapesInQueue(
     roomSlug: string,
     message: string,
-    userId: string
+    userId: string,
+    type: string
   ) {
     try {
       console.log("in the putShapesInQueue");
@@ -93,7 +117,7 @@ export class Redis {
       console.log(message);
       await redis.lPush(
         Redis.shapesQueueKey,
-        JSON.stringify({ roomSlug, message, userId })
+        JSON.stringify({ roomSlug, message, userId, type })
       );
     } catch (e) {
       console.log("error in putShapesInQueue: " + e);
@@ -105,6 +129,7 @@ export class Redis {
       roomSlug: string;
       message: string;
       userId: string;
+      type: string;
     }) => Promise<void>
   ) {
     try {
@@ -119,7 +144,10 @@ export class Redis {
 
           await handler(data);
 
-          await client.publish(`shapes:${data.roomSlug}`, data.message);
+          await client.publish(
+            `shapes:${data.roomSlug}`,
+            JSON.stringify({ message: data.message, type: data.type })
+          );
         }
       }
     } catch (e) {

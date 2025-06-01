@@ -76,7 +76,32 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
 
     if (parsedMessage.type === "shapes") {
       const { roomSlug, message } = parsedMessage.payload;
-      await Redis.putShapesInQueue(roomSlug, message, userId);
+      await Redis.putShapesInQueue(
+        roomSlug,
+        message,
+        userId,
+        parsedMessage.type
+      );
+    }
+
+    if (parsedMessage.type === "delete_shape") {
+      const { roomSlug, message } = parsedMessage.payload;
+      await Redis.putShapesInQueue(
+        roomSlug,
+        message,
+        userId,
+        parsedMessage.type
+      );
+    }
+
+    if (parsedMessage.type === "update_shape") {
+      const { roomSlug, message } = parsedMessage.payload;
+      await Redis.putShapesInQueue(
+        roomSlug,
+        message,
+        userId,
+        parsedMessage.type
+      );
     }
   });
 

@@ -10,6 +10,7 @@ import {
 import React, { useContext, useEffect, useRef, useState } from "react";
 import SideBar from "./SideBar";
 import { ThemeContext } from "@/lib/ThemeProvider";
+import { useAuthContext } from "@/context/AuthContext";
 
 const Canvas = ({
   roomSlug,
@@ -24,6 +25,8 @@ const Canvas = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const { theme } = useContext(ThemeContext);
+  const { userId } = useAuthContext();
+  console.log(userId);
 
   const [details, setDetails] = useState<FormDataTypes>({
     strokeColor: theme === "dark" ? "#fff" : "#000",
@@ -42,7 +45,8 @@ const Canvas = ({
         theme,
         details,
         setDetails,
-        setSideBar
+        setSideBar,
+        userId
       );
       setDraw(draw);
 

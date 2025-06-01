@@ -1,5 +1,7 @@
 "use client";
 
+import { HTTP_URL } from "@/lib/utils";
+import axios from "axios";
 import {
   createContext,
   useContext,
@@ -10,22 +12,33 @@ import {
 
 interface AuthContextProps {
   authenticated: boolean;
+  userId: string;
 }
 
 const AuthContext = createContext<AuthContextProps | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [authenticated, setAuthenticated] = useState(false);
+  const [userId, setUserId] = useState<string>("");
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
+  const getToken = async () => {
+    const res = await axios.get(`${HTTP_URL}/who`, {
+      headers: {
+        Authorization: localStorage.getItem("token"),
+      },
+    });
 
-    if (!storedToken) {
-      setAuthenticated(false);
-    } else {
+    if (res.status === 201) {
       setAuthenticated(true);
+      setUserId(res.data.message.userId);
+    } else {
+      setAuthenticated(false);
+      setUserId("");
     }
+  };
+  useEffect(() => {
+    getToken();
     setMounted(true);
   }, [authenticated]);
 
@@ -34,7 +47,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ authenticated }}>
+    <AuthContext.Provider value={{ authenticated, userId }}>
       {children}
     </AuthContext.Provider>
   );

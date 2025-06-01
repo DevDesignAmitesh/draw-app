@@ -10,7 +10,6 @@ import { useAuthContext } from "@/context/AuthContext";
 const Hero = () => {
   const { theme } = useContext(ThemeContext);
   const { authenticated } = useAuthContext();
-  console.log(authenticated);
 
   return (
     <div className="w-full py-10 lg:pt-24 pt-14 flex lg:flex-row flex-col justify-center lg:justify-between items-center gap-10">

@@ -14,13 +14,37 @@ const main = async () => {
         return;
       }
 
-      await prisma.shapes.create({
-        data: {
-          userId: data.userId,
-          roomId: room.id,
-          message: data.message,
-        },
-      });
+      if (data.type === "shapes") {
+        const parsedMessage = JSON.parse(data.message);
+        await prisma.shapes.create({
+          data: {
+            id: parsedMessage.id,
+            userId: data.userId,
+            roomId: room.id,
+            message: data.message,
+          },
+        });
+      }
+      if (data.type === "delete_shape") {
+        await prisma.shapes.delete({
+          where: {
+            id: data.message,
+            roomId: room.id,
+          },
+        });
+      }
+      if (data.type === "update_shape") {
+        const shapeId = JSON.parse(data.message).id;
+        await prisma.shapes.update({
+          where: {
+            id: shapeId,
+            roomId: room.id,
+          },
+          data: {
+            message: data.message,
+          },
+        });
+      }
     } catch (e) {
       console.log("error in worker: " + e);
     }

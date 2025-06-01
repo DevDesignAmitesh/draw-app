@@ -44,6 +44,7 @@ export const redoItems: RedoItemsProps[] = [
 
 export type Shapes =
   | {
+      id?: string;
       type: "square";
       x: number;
       y: number;
@@ -56,6 +57,7 @@ export type Shapes =
       opacity: number;
     }
   | {
+      id?: string;
       type: "circle";
       x: number;
       y: number;
@@ -67,6 +69,7 @@ export type Shapes =
       opacity: number;
     }
   | {
+      id?: string;
       type: "line";
       x: number;
       y: number;
@@ -79,6 +82,7 @@ export type Shapes =
       opacity: number;
     }
   | {
+      id?: string;
       type: "triangle";
       x1: number;
       y1: number;

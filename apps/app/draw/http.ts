@@ -9,7 +9,10 @@ export async function getAllShapes(slug: string): Promise<Shapes[]> {
     let shape: Shapes[] = [];
     res.data.shapes.forEach((item: any) => {
       const parsed = JSON.parse(item.message);
-      shape.push(parsed);
+      shape.push({
+        id: item.id,
+        ...parsed,
+      });
     });
     return shape;
   } catch (error) {

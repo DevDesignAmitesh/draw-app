@@ -5,6 +5,7 @@ import {
   Shapes,
 } from "@/lib/utils";
 import { getAllShapes } from "./http";
+import { v4 as uuidv4 } from "uuid";
 
 export class Draw {
   private ws: WebSocket;
@@ -29,6 +30,7 @@ export class Draw {
   private setSideBar: React.Dispatch<React.SetStateAction<boolean>>;
   private opacity: number;
   private fillColor: string | null;
+  private userId: string;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -37,8 +39,10 @@ export class Draw {
     theme: string,
     details: FormDataTypes,
     setDetails: React.Dispatch<React.SetStateAction<FormDataTypes>>,
-    setSideBar: React.Dispatch<React.SetStateAction<boolean>>
+    setSideBar: React.Dispatch<React.SetStateAction<boolean>>,
+    userId: string
   ) {
+    this.userId = userId;
     this.details = details;
     this.setDetails = setDetails;
     this.setSideBar = setSideBar;
@@ -78,22 +82,46 @@ export class Draw {
 
   public webSockerInitHandler = () => {
     this.ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      const shapes = JSON.parse(data.message);
-      console.log("hello");
-      console.log(shapes);
-      console.log("hello");
-      this.existingShapes.push(shapes);
-      this.renderAllShapes();
+      try {
+        const data = JSON.parse(event.data);
+        console.log(data);
+        console.log(data.userId, "sender user id");
+        console.log(this.userId, "mine userId");
+
+        if (data.type === "shapes") {
+          const shapes = JSON.parse(data.message);
+          this.existingShapes.push(shapes);
+        }
+
+        if (data.type === "delete_shape") {
+          this.existingShapes = this.existingShapes.filter(
+            (s) => s.id !== data.message
+          );
+        }
+
+        if (data.type === "update_shape") {
+          const updatedShape = JSON.parse(data.message);
+          this.existingShapes = this.existingShapes.map((shape) =>
+            shape.id === updatedShape.id ? updatedShape : shape
+          );
+        }
+        this.renderAllShapes();
+      } catch (error) {
+        console.error("Error parsing WebSocket message:", error);
+      }
     };
   };
 
   public sendMessageViaWebSocket = (shape: Shapes) => {
-    const message = {
-      type: "shapes",
-      payload: { message: JSON.stringify(shape), roomSlug: this.roomSlug },
-    };
-    this.ws.send(JSON.stringify(message));
+    this.ws.send(
+      JSON.stringify({
+        type: "shapes",
+        payload: {
+          message: JSON.stringify(shape),
+          roomSlug: this.roomSlug,
+        },
+      })
+    );
   };
 
   public changeTheme(theme: string) {
@@ -130,6 +158,16 @@ export class Draw {
       selectedShape.strokeStyle = newStyle;
       selectedShape.opacity = newOpacity;
       selectedShape.fillColor = newBg;
+
+      this.ws.send(
+        JSON.stringify({
+          type: "update_shape",
+          payload: {
+            message: JSON.stringify(selectedShape),
+            roomSlug: this.roomSlug,
+          },
+        })
+      );
 
       this.originalColors.set(this.selectedId, newColor);
 
@@ -245,6 +283,7 @@ export class Draw {
       let w = this.currentX - this.startX;
       let h = this.currentY - this.startY;
       shape = {
+        id: uuidv4(),
         type: "square",
         x: this.startX,
         y: this.startY,
@@ -256,7 +295,6 @@ export class Draw {
         strokeStyle: currentStrokeStyle,
         fillColor: currentBg!,
       };
-      this.existingShapes.push(shape);
       this.sendMessageViaWebSocket(shape);
     }
 
@@ -265,6 +303,7 @@ export class Draw {
         (this.currentX - this.startX) ** 2 + (this.currentY - this.startY) ** 2
       );
       shape = {
+        id: uuidv4(),
         type: "circle",
         x: this.startX,
         y: this.startY,
@@ -275,12 +314,12 @@ export class Draw {
         strokeStyle: currentStrokeStyle,
         fillColor: currentBg!,
       };
-      this.existingShapes.push(shape);
       this.sendMessageViaWebSocket(shape);
     }
 
     if (this.selectedTools === "line") {
       shape = {
+        id: uuidv4(),
         type: "line",
         x: this.startX,
         y: this.startY,
@@ -292,7 +331,6 @@ export class Draw {
         strokeStyle: currentStrokeStyle,
         fillColor: currentBg!,
       };
-      this.existingShapes.push(shape);
       this.sendMessageViaWebSocket(shape);
     }
 
@@ -303,8 +341,8 @@ export class Draw {
       const y2 = this.currentY;
       const x3 = x1 * 2 - x2;
       const y3 = y2;
-
-      const shape: Shapes = {
+      shape = {
+        id: uuidv4(),
         type: "triangle",
         x1,
         y1,
@@ -318,8 +356,6 @@ export class Draw {
         strokeStyle: currentStrokeStyle,
         fillColor: currentBg!,
       };
-
-      this.existingShapes.push(shape);
       this.sendMessageViaWebSocket(shape);
     }
   };
@@ -335,7 +371,6 @@ export class Draw {
         this.currentY = e.clientY - rect.top;
       }
 
-      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.renderAllShapes();
 
       const currentOpacity = this.details.opacity || this.opacity;
@@ -385,6 +420,15 @@ export class Draw {
           this.existingShapes.splice(result.index, 1);
           this.undoShapes.push(last);
           this.originalColors.delete(result.index);
+          this.ws.send(
+            JSON.stringify({
+              type: "delete_shape",
+              payload: {
+                roomSlug: this.roomSlug,
+                message: last.id,
+              },
+            })
+          );
         }
       }
 
@@ -419,6 +463,16 @@ export class Draw {
             selectedShape.x2 = this.currentX;
             selectedShape.y2 = this.currentY;
           }
+
+          this.ws.send(
+            JSON.stringify({
+              type: "update_shape",
+              payload: {
+                message: JSON.stringify(selectedShape),
+                roomSlug: this.roomSlug,
+              },
+            })
+          );
         }
       }
     }
@@ -492,6 +546,7 @@ export class Draw {
       }
 
       this.setSideBar(shouldShowSidebar);
+      console.log(result.item);
       this.renderAllShapes();
     }
   };
