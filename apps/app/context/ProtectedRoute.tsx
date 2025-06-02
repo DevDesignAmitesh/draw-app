@@ -10,11 +10,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (!authenticated) {
-      router.push("/signup");
+      router.replace("/signup");
     }
   }, [authenticated]);
 
-  return <>{children}</>;
+  return <>{authenticated ? children : null}</>;
 };
 
 export default ProtectedRoute;
