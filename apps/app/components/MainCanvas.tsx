@@ -3,9 +3,11 @@
 import React, { useEffect, useState } from "react";
 import Canvas from "./Canvas";
 import { WS_URL } from "@/lib/utils";
+import { useAuthContext } from "@/context/AuthContext";
 
 const MainCanvas = ({ roomSlug }: { roomSlug: string }) => {
   const [socket, setSocket] = useState<WebSocket>();
+  const { userId } = useAuthContext();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -17,7 +19,7 @@ const MainCanvas = ({ roomSlug }: { roomSlug: string }) => {
       ws.send(
         JSON.stringify({
           type: "join_room",
-          payload: { roomSlug },
+          payload: { roomSlug, userId },
         })
       );
       setSocket(ws);

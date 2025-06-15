@@ -7,20 +7,20 @@ import { Redis } from "@repo/redis/db";
 
 const users: usersProps[] = [];
 
-function checkUserAuth(token: string): string | null {
+function checkUserAuth(token: string): JwtPayload | null {
   try {
     const decoded = verify(token, process.env.JWT_SECRET!) as JwtPayload;
     if (!decoded.userId) {
       return null;
     }
-    return decoded.userId;
+    return decoded;
   } catch (error) {
     console.log(error);
     return null;
   }
 }
 
-const wss = new WebSocketServer({ port: 8080 });
+const wss = new WebSocketServer({ port: 9000 });
 
 wss.on("connection", (ws: WebSocket, req: Request) => {
   const url = req.url;
@@ -36,17 +36,10 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
     return;
   }
 
-  const userId = checkUserAuth(token);
-
-  if (!userId) {
-    return;
-  }
-
   ws.on("message", async (e) => {
     const parsedMessage = JSON.parse(e.toString());
     if (parsedMessage.type === "join_room") {
-      console.log(parsedMessage);
-      const { roomSlug } = parsedMessage.payload;
+      const { roomSlug, userId } = parsedMessage.payload;
       users.push({
         ws,
         userId,
@@ -75,7 +68,7 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
     }
 
     if (parsedMessage.type === "shapes") {
-      const { roomSlug, message } = parsedMessage.payload;
+      const { roomSlug, message, userId } = parsedMessage.payload;
       await Redis.putShapesInQueue(
         roomSlug,
         message,
@@ -85,7 +78,7 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
     }
 
     if (parsedMessage.type === "delete_shape") {
-      const { roomSlug, message } = parsedMessage.payload;
+      const { roomSlug, message, userId } = parsedMessage.payload;
       await Redis.putShapesInQueue(
         roomSlug,
         message,
@@ -95,7 +88,7 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
     }
 
     if (parsedMessage.type === "update_shape") {
-      const { roomSlug, message } = parsedMessage.payload;
+      const { roomSlug, message, userId } = parsedMessage.payload;
       await Redis.putShapesInQueue(
         roomSlug,
         message,

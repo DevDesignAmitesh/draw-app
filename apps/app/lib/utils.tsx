@@ -363,4 +363,4 @@ export interface FormDataTypes {
 }
 
 export const HTTP_URL = "http://localhost:5000/api/v1";
-export const WS_URL = "http://localhost:8080";
+export const WS_URL = "http://localhost:9000";

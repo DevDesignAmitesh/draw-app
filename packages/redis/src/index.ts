@@ -44,13 +44,17 @@ export class Redis {
   ) {
     try {
       const client = await Redis.getSubscriberClient();
-
       if (!subscribedRooms.has(roomSlug)) {
         subscribedRooms.add(roomSlug);
         await client.subscribe(`shapes:${roomSlug}`, (data: any) => {
           const parsedMessage: any = JSON.parse(data);
-          users.forEach((u) => {
-            if (u.roomSlug === roomSlug) {
+          console.log(parsedMessage);
+          users
+            .filter(
+              (u) =>
+                u.userId !== parsedMessage.userId && u.roomSlug === roomSlug
+            )
+            .forEach((u) => {
               if (parsedMessage.type === "shapes") {
                 u.ws.send(
                   JSON.stringify({
@@ -78,8 +82,7 @@ export class Redis {
                   })
                 );
               }
-            }
-          });
+            });
         });
 
         const userIndex = users.findIndex((u) => u.ws === ws);
@@ -112,9 +115,7 @@ export class Redis {
     type: string
   ) {
     try {
-      console.log("in the putShapesInQueue");
       const redis = await Redis.getCommandClient();
-      console.log(message);
       await redis.lPush(
         Redis.shapesQueueKey,
         JSON.stringify({ roomSlug, message, userId, type })
@@ -134,19 +135,20 @@ export class Redis {
   ) {
     try {
       const client = await Redis.getCommandClient();
-      console.log("in the pickupShapesAndPutInDb");
       while (true) {
         const result = await client.brPop(Redis.shapesQueueKey, 0);
         if (result) {
           const data = JSON.parse(result.element);
-
+          console.log("in pickupShapesAndPutInDb");
           console.log(data);
-
           await handler(data);
-
           await client.publish(
             `shapes:${data.roomSlug}`,
-            JSON.stringify({ message: data.message, type: data.type })
+            JSON.stringify({
+              message: data.message,
+              type: data.type,
+              userId: data.userId,
+            })
           );
         }
       }

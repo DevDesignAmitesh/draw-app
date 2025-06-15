@@ -84,12 +84,10 @@ export class Draw {
     this.ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        console.log(data);
-        console.log(data.userId, "sender user id");
-        console.log(this.userId, "mine userId");
 
         if (data.type === "shapes") {
           const shapes = JSON.parse(data.message);
+          console.log(data);
           this.existingShapes.push(shapes);
         }
 
@@ -113,13 +111,16 @@ export class Draw {
   };
 
   public sendMessageViaWebSocket = (shape: Shapes) => {
+    let data = {
+      message: JSON.stringify(shape),
+      roomSlug: this.roomSlug,
+      userId: this.userId,
+    };
+    console.log(data);
     this.ws.send(
       JSON.stringify({
         type: "shapes",
-        payload: {
-          message: JSON.stringify(shape),
-          roomSlug: this.roomSlug,
-        },
+        payload: data,
       })
     );
   };
@@ -186,6 +187,7 @@ export class Draw {
   public renderAllShapes = () => {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.existingShapes.map((item) => {
+      console.log(item.opacity);
       this.context.globalAlpha = item.opacity;
       this.context.beginPath();
 
@@ -296,6 +298,7 @@ export class Draw {
         fillColor: currentBg!,
       };
       this.sendMessageViaWebSocket(shape);
+      this.existingShapes.push(shape);
     }
 
     if (this.selectedTools === "circle") {
@@ -315,6 +318,7 @@ export class Draw {
         fillColor: currentBg!,
       };
       this.sendMessageViaWebSocket(shape);
+      this.existingShapes.push(shape);
     }
 
     if (this.selectedTools === "line") {
@@ -332,6 +336,7 @@ export class Draw {
         fillColor: currentBg!,
       };
       this.sendMessageViaWebSocket(shape);
+      this.existingShapes.push(shape);
     }
 
     if (this.selectedTools === "triangle") {
@@ -357,6 +362,7 @@ export class Draw {
         fillColor: currentBg!,
       };
       this.sendMessageViaWebSocket(shape);
+      this.existingShapes.push(shape);
     }
   };
 
