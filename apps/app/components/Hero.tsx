@@ -5,11 +5,9 @@ import SuperBtn from "./SuperBtn";
 import Image from "next/image";
 import { ThemeContext } from "@/lib/ThemeProvider";
 import Link from "next/link";
-import { useAuthContext } from "@/context/AuthContext";
 
-const Hero = () => {
+const Hero = ({ userId }: { userId: string | null }) => {
   const { theme } = useContext(ThemeContext);
-  const { authenticated } = useAuthContext();
 
   return (
     <div className="w-full py-10 lg:pt-24 pt-14 flex lg:flex-row flex-col justify-center lg:justify-between items-center gap-10">
@@ -21,7 +19,7 @@ const Hero = () => {
           Create beautiful diagrams, flowcharts, and sketches with a minimalist,
           intuitive interface. Just like Excalidraw, but built by you.
         </p>
-        {!authenticated ? (
+        {!userId ? (
           <div className="flex justify-center items-center gap-4 lg:mt-8 mt-4">
             <Link href={"/signup"}>
               <SuperBtn label="get started" variant="secondary" />

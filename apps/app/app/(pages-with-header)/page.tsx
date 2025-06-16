@@ -1,22 +1,15 @@
-"use client";
-
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import VideoDemo from "@/components/VideoDemo";
 import React from "react";
-import { useAuthContext } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
+import { getUserId } from "@/draw/http";
 
-const page = () => {
-  const { authenticated } = useAuthContext();
-  const router = useRouter();
+const page = async () => {
+  const userId = await getUserId();
 
-  if (authenticated) {
-    router.push("/dashboard");
-  }
   return (
     <div className="w-full h-auto relative">
-      <Hero />
+      <Hero userId={userId} />
       <VideoDemo />
       <Footer />
     </div>

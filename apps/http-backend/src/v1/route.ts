@@ -61,12 +61,19 @@ v1Router.post("/signin", async (req: Request, res: Response): Promise<any> => {
   console.log(user);
 
   if (!process.env.JWT_SECRET) {
-    return res.status(201).json({ message: "jwt token not found" });
+    return res.status(201).json({ message: "jwt secret not found" });
   }
 
   const token = sign({ userId: user.id }, process.env.JWT_SECRET);
 
   console.log(token);
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
 
   return res.status(201).json({ message: "successfull", token });
 });

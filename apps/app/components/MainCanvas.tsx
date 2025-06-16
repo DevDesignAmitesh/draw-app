@@ -3,18 +3,20 @@
 import React, { useEffect, useState } from "react";
 import Canvas from "./Canvas";
 import { WS_URL } from "@/lib/utils";
-import { useAuthContext } from "@/context/AuthContext";
 
-const MainCanvas = ({ roomSlug }: { roomSlug: string }) => {
+const MainCanvas = ({
+  roomSlug,
+  userId,
+  token,
+}: {
+  roomSlug: string;
+  userId: string;
+  token: string;
+}) => {
   const [socket, setSocket] = useState<WebSocket>();
-  const { userId } = useAuthContext();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      return;
-    }
-    const ws = new WebSocket(`${WS_URL}?token=${token.split("Bearer ")[1]}`);
+    const ws = new WebSocket(`${WS_URL}?token=Bearer ${token}`);
     ws.onopen = () => {
       ws.send(
         JSON.stringify({
@@ -30,7 +32,7 @@ const MainCanvas = ({ roomSlug }: { roomSlug: string }) => {
     return <div>connecting to server...</div>;
   }
 
-  return <Canvas socket={socket} roomSlug={roomSlug} />;
+  return <Canvas socket={socket} roomSlug={roomSlug} userId={userId} />;
 };
 
 export default MainCanvas;

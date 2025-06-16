@@ -166,6 +166,7 @@ export class Draw {
           payload: {
             message: JSON.stringify(selectedShape),
             roomSlug: this.roomSlug,
+            userId: this.userId,
           },
         })
       );
@@ -432,6 +433,7 @@ export class Draw {
               payload: {
                 roomSlug: this.roomSlug,
                 message: last.id,
+                userId: this.userId,
               },
             })
           );
@@ -476,6 +478,7 @@ export class Draw {
               payload: {
                 message: JSON.stringify(selectedShape),
                 roomSlug: this.roomSlug,
+                userId: this.userId,
               },
             })
           );

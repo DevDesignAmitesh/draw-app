@@ -23,10 +23,16 @@ const AuthScreen = ({ isSignin }: { isSignin?: boolean }) => {
     }
     try {
       setLoading(true);
-      const res = await axios.post(`${HTTP_URL}/signin`, {
-        email,
-        password,
-      });
+      const res = await axios.post(
+        `${HTTP_URL}/signin`,
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       console.log(res);
 
@@ -48,11 +54,19 @@ const AuthScreen = ({ isSignin }: { isSignin?: boolean }) => {
     }
     try {
       setLoading(true);
-      const res = await axios.post(`${HTTP_URL}/signup`, {
-        name,
-        email,
-        password,
-      });
+      const res = await axios.post(
+        `${HTTP_URL}/signup`,
+        {
+          name,
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      console.log(res);
 
       if (res.status === 201) {
         await handleSignin();

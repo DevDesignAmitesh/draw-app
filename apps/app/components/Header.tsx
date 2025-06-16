@@ -1,16 +1,13 @@
-"use client";
-
 import React from "react";
 import SuperBtn from "./SuperBtn";
 import ToggleBtn from "./ToggleBtn";
 import Link from "next/link";
-import { useAuthContext } from "@/context/AuthContext";
 
-const Header = () => {
-  const { authenticated } = useAuthContext();
+const Header = ({ userId }: { userId: string | null }) => {
+  console.log("in the header", userId);
   return (
     <div className="w-full py-5 bg-white dark:bg-[#121212] text-black dark:text-white lg:px-20 px-10 flex justify-between items-center">
-      {authenticated ? (
+      {userId ? (
         <div className="flex flex-col justify-center items-start gap-1">
           <h1 className="text-3xl font-bold capitalize dark:text-white text-black">
             your boards
@@ -22,9 +19,10 @@ const Header = () => {
       ) : (
         <h1 className="text-2xl font-bold capitalize">drawing app</h1>
       )}
+
       <div className="flex justify-between items-center lg:gap-4 gap-1">
         <ToggleBtn />
-        {authenticated ? (
+        {userId ? (
           <>
             <Link href={"/"}>
               <SuperBtn

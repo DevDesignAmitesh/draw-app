@@ -33,12 +33,10 @@ const CreateRoom = () => {
           slug: roomUrl,
         },
         {
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
+          withCredentials: true,
         }
       );
-      
+
       if (res.status === 200) {
         router.push(`/canvas/${res.data.slug}`);
       }
