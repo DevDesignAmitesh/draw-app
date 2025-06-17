@@ -7,9 +7,11 @@ export function middleware(
   next: NextFunction
 ): any {
   const token = req.cookies.token;
+  console.log("token in the backend route", token);
+  console.log("token in the backend route", req.cookies);
 
   if (!token) {
-    return res.json({ message: "token not provided" }).status(405);
+    return res.status(400).json({ message: "token not provided" });
   }
 
   console.log(token);

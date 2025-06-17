@@ -1,5 +1,5 @@
 import Header from "@/components/Header";
-import { getUserId } from "@/draw/http";
+import { getUserId } from "@/draw/server-http";
 
 export default async function Layout({
   children,

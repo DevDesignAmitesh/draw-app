@@ -160,6 +160,8 @@ v1Router.get(
 v1Router.get("/who", middleware, (req: Request, res: Response): any => {
   try {
     const decoded = (req as JwtPayload).user;
+    console.log("in the backend route who");
+    console.log(decoded);
     return res.status(201).json({ message: decoded });
   } catch (error) {
     console.log(error);

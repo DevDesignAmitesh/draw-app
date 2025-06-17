@@ -1,33 +1,15 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { FaProjectDiagram } from "react-icons/fa";
-import axios from "axios";
-import { HTTP_URL } from "@/lib/utils";
 import Link from "next/link";
+import { getAllRooms } from "@/draw/server-http";
 
-const Dashboard = () => {
-  const [cards, setCards] = useState<
-    { name: string; id: string; slug: string }[]
-  >([]);
+const Dashboard = async () => {
+  const cards: { name: string; id: string; slug: string }[] =
+    await getAllRooms();
 
-  useEffect(() => {
-    const getAllRooms = async () => {
-      try {
-        const res = await axios.get(`${HTTP_URL}/room`, {
-          headers: {
-            Authorization: localStorage.getItem("token") || "",
-          },
-        });
-        setCards(res.data.rooms ?? []);
-      } catch (error) {
-        console.error("Error fetching rooms:", error);
-        setCards([]); // Optional: reset to empty on error
-      }
-    };
-
-    getAllRooms();
-  }, []);
+  if (!Array.isArray(cards)) {
+    return <div>rooms not found</div>;
+  }
 
   return (
     <div className="w-full min-h-[80vh] max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center place-content-center">

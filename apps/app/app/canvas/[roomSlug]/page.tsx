@@ -1,5 +1,5 @@
 import MainCanvas from "@/components/MainCanvas";
-import { getUserId } from "@/draw/http";
+import { getUserId } from "@/draw/server-http";
 import { cookies } from "next/headers";
 import React from "react";
 
@@ -10,7 +10,13 @@ const page = async ({ params }: { params: Promise<{ roomSlug: string }> }) => {
 
   const userId = await getUserId();
 
-  return <MainCanvas roomSlug={roomSlug} userId={userId!} token={token!} />;
+  return (
+    <MainCanvas
+      roomSlug={roomSlug}
+      userId={userId!}
+      token={token!}
+    />
+  );
 };
 
 export default page;

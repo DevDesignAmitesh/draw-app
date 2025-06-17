@@ -7,18 +7,18 @@ import { Redis } from "@repo/redis/db";
 
 const users: usersProps[] = [];
 
-function checkUserAuth(token: string): JwtPayload | null {
-  try {
-    const decoded = verify(token, process.env.JWT_SECRET!) as JwtPayload;
-    if (!decoded.userId) {
-      return null;
-    }
-    return decoded;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-}
+// function checkUserAuth(token: string): JwtPayload | null {
+//   try {
+//     const decoded = verify(token, process.env.JWT_SECRET!) as JwtPayload;
+//     if (!decoded.userId) {
+//       return null;
+//     }
+//     return decoded;
+//   } catch (error) {
+//     console.log(error);
+//     return null;
+//   }
+// }
 
 const wss = new WebSocketServer({ port: 9000 });
 
@@ -69,6 +69,10 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
 
     if (parsedMessage.type === "shapes") {
       const { roomSlug, message, userId } = parsedMessage.payload;
+      console.log(
+        "in the ws backend and in the type shapes",
+        parsedMessage.payload
+      );
       await Redis.putShapesInQueue(
         roomSlug,
         message,

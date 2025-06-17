@@ -2,7 +2,7 @@ import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import VideoDemo from "@/components/VideoDemo";
 import React from "react";
-import { getUserId } from "@/draw/http";
+import { getUserId } from "@/draw/server-http";
 
 const page = async () => {
   const userId = await getUserId();

@@ -48,6 +48,7 @@ export class Redis {
         subscribedRooms.add(roomSlug);
         await client.subscribe(`shapes:${roomSlug}`, (data: any) => {
           const parsedMessage: any = JSON.parse(data);
+          console.log("in the subscribe and send");
           console.log(parsedMessage);
           users
             .filter(
@@ -116,6 +117,13 @@ export class Redis {
   ) {
     try {
       const redis = await Redis.getCommandClient();
+      console.log(
+        "in the put shapes in queue",
+        roomSlug,
+        message,
+        userId,
+        type
+      );
       await redis.lPush(
         Redis.shapesQueueKey,
         JSON.stringify({ roomSlug, message, userId, type })

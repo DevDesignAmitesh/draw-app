@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Canvas from "./Canvas";
-import { WS_URL } from "@/lib/utils";
+import { Shapes, WS_URL } from "@/lib/utils";
 
 const MainCanvas = ({
   roomSlug,
@@ -32,7 +32,13 @@ const MainCanvas = ({
     return <div>connecting to server...</div>;
   }
 
-  return <Canvas socket={socket} roomSlug={roomSlug} userId={userId} />;
+  return (
+    <Canvas
+      socket={socket}
+      roomSlug={roomSlug}
+      userId={userId}
+    />
+  );
 };
 
 export default MainCanvas;

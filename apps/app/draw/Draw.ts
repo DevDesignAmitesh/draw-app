@@ -4,7 +4,7 @@ import {
   selectedTools,
   Shapes,
 } from "@/lib/utils";
-import { getAllShapes } from "./http";
+import { getAllShapes } from "./client-http";
 import { v4 as uuidv4 } from "uuid";
 
 export class Draw {
@@ -84,10 +84,10 @@ export class Draw {
     this.ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
+        console.log(data);
 
         if (data.type === "shapes") {
           const shapes = JSON.parse(data.message);
-          console.log(data);
           this.existingShapes.push(shapes);
         }
 
@@ -188,7 +188,6 @@ export class Draw {
   public renderAllShapes = () => {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.existingShapes.map((item) => {
-      console.log(item.opacity);
       this.context.globalAlpha = item.opacity;
       this.context.beginPath();
 
@@ -365,6 +364,7 @@ export class Draw {
       this.sendMessageViaWebSocket(shape);
       this.existingShapes.push(shape);
     }
+    this.renderAllShapes();
   };
 
   private mouseMoveHandler = (e: MouseEvent | TouchEvent) => {
@@ -555,7 +555,6 @@ export class Draw {
       }
 
       this.setSideBar(shouldShowSidebar);
-      console.log(result.item);
       this.renderAllShapes();
     }
   };
