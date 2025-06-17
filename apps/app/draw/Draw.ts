@@ -38,6 +38,12 @@ export class Draw {
       text: string;
     } | null>
   >;
+  public textBoxes: {
+    id: string;
+    x: number;
+    y: number;
+    text: string;
+  }[];
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -54,9 +60,16 @@ export class Draw {
         y: number;
         text: string;
       } | null>
-    >
+    >,
+    textBoxes: {
+      id: string;
+      x: number;
+      y: number;
+      text: string;
+    }[]
   ) {
     this.userId = userId;
+    this.textBoxes = textBoxes;
     this.details = details;
     this.setDetails = setDetails;
     this.setSideBar = setSideBar;
@@ -79,7 +92,7 @@ export class Draw {
     this.startY = 0;
     this.currentX = 0;
     this.currentY = 0;
-    this.renderAllShapes();
+    this.renderAllShapes(this.textBoxes);
     this.loadAllShapes(roomSlug);
     this.webSockerInitHandler();
     this.startHandler();
@@ -89,7 +102,7 @@ export class Draw {
   public loadAllShapes = async (slug: string) => {
     try {
       this.existingShapes = await getAllShapes(slug);
-      this.renderAllShapes();
+      this.renderAllShapes(this.textBoxes);
     } catch (error) {
       console.log(error);
     }
@@ -118,7 +131,7 @@ export class Draw {
             shape.id === updatedShape.id ? updatedShape : shape
           );
         }
-        this.renderAllShapes();
+        this.renderAllShapes(this.textBoxes);
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
       }
@@ -156,7 +169,7 @@ export class Draw {
       }
     });
 
-    this.renderAllShapes();
+    this.renderAllShapes(this.textBoxes);
   }
 
   public changeStyles(data: FormDataTypes) {
@@ -197,10 +210,17 @@ export class Draw {
     this.opacity = data.opacity ?? this.opacity;
     this.fillColor = data.bgColor ?? this.fillColor;
 
-    this.renderAllShapes();
+    this.renderAllShapes(this.textBoxes);
   }
 
-  public renderAllShapes = () => {
+  public renderAllShapes = (
+    textBoxes: {
+      id: string;
+      x: number;
+      y: number;
+      text: string;
+    }[]
+  ) => {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.existingShapes.map((item) => {
       this.context.globalAlpha = item.opacity;
@@ -237,22 +257,10 @@ export class Draw {
 
       this.context.globalAlpha = 1;
     });
-  };
-
-  public renderAllInput = (
-    textBoxes: {
-      id: string;
-      x: number;
-      y: number;
-      text: string;
-    }[]
-  ) => {
-    this.startHandler();
-    console.log("hello in the render all inputs", textBoxes);
-    textBoxes.forEach((txtBox) => {
+    textBoxes?.forEach((txtBox) => {
       console.log(txtBox);
       this.context.fillStyle = "white";
-      this.context.font = "48px";
+      this.context.font = "32px serif";
       this.context.fillText(txtBox.text, txtBox.x, txtBox.y);
     });
   };
@@ -398,7 +406,7 @@ export class Draw {
       this.sendMessageViaWebSocket(shape);
       this.existingShapes.push(shape);
     }
-    this.renderAllShapes();
+    this.renderAllShapes(this.textBoxes);
   };
 
   private mouseMoveHandler = (e: MouseEvent | TouchEvent) => {
@@ -412,7 +420,7 @@ export class Draw {
         this.currentY = e.clientY - rect.top;
       }
 
-      this.renderAllShapes();
+      this.renderAllShapes(this.textBoxes);
 
       const currentOpacity = this.details.opacity || this.opacity;
       this.context.globalAlpha = currentOpacity;
@@ -589,7 +597,7 @@ export class Draw {
       }
 
       this.setSideBar(shouldShowSidebar);
-      this.renderAllShapes();
+      this.renderAllShapes(this.textBoxes);
     }
 
     if (this.selectedTools === "text") {
@@ -676,14 +684,14 @@ export class Draw {
       this.originalColors.clear();
     }
 
-    this.renderAllShapes();
+    this.renderAllShapes(this.textBoxes);
   };
 
   public redoLastShape = () => {
     if (this.undoShapes.length === 0) return;
     const last = this.undoShapes.pop()!;
     this.existingShapes.push(last);
-    this.renderAllShapes();
+    this.renderAllShapes(this.textBoxes);
   };
 
   public downloadImage = () => {

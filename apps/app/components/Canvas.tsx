@@ -10,6 +10,7 @@ import {
 import React, { useContext, useEffect, useRef, useState } from "react";
 import SideBar from "./SideBar";
 import { ThemeContext } from "@/lib/ThemeProvider";
+import { v4 as uuidv4 } from "uuid";
 
 const Canvas = ({
   roomSlug,
@@ -57,7 +58,8 @@ const Canvas = ({
         setDetails,
         setSideBar,
         userId,
-        setActiveInput
+        setActiveInput,
+        textBoxes
       );
       setDraw(draw);
 
@@ -88,7 +90,7 @@ const Canvas = ({
   useEffect(() => {
     if (draw) {
       console.log("in the frontend");
-      draw.renderAllInput(textBoxes);
+      draw.renderAllShapes(textBoxes);
     }
   }, [textBoxes, activeInput]);
 
@@ -151,6 +153,7 @@ const Canvas = ({
       {sideBar && <SideBar details={details} setDetails={setDetails} />}
 
       <canvas ref={canvasRef} />
+
       {activeInput && (
         <input
           type="text"
@@ -159,6 +162,7 @@ const Canvas = ({
           style={{
             top: activeInput.y,
             left: activeInput.x,
+            color: theme === "dark" ? "#fff" : "#000",
           }}
           onChange={(e) =>
             setActiveInput({ ...activeInput, text: e.target.value })
@@ -167,13 +171,13 @@ const Canvas = ({
             if (activeInput.text.trim() !== "") {
               setTextBoxes((prev) => [
                 ...prev,
-                { ...activeInput, id: crypto.randomUUID() },
+                { ...activeInput, id: uuidv4() },
               ]);
             }
             setActiveInput(null);
           }}
           value={activeInput.text}
-          className="absolute z-50 p-5 text-white"
+          className="absolute z-50 p-2 outline-none bg-transparent"
         />
       )}
     </div>
