@@ -1,6 +1,7 @@
 import { ReactElement } from "react";
 import { BiRedo } from "react-icons/bi";
 import { BsEraser, BsTriangle } from "react-icons/bs";
+import { CiText } from "react-icons/ci";
 import { FaRegCircle, FaRegHandPaper, FaRegSquare } from "react-icons/fa";
 import { FiDownload } from "react-icons/fi";
 import { GrUndo } from "react-icons/gr";
@@ -15,7 +16,8 @@ export type selectedTools =
   | "hand"
   | "undo"
   | "redo"
-  | "download";
+  | "download"
+  | "text";
 
 interface TopBarItemProps {
   icon: ReactElement;
@@ -30,6 +32,7 @@ export const topBarItems: TopBarItemProps[] = [
   { icon: <FaRegHandPaper />, label: "hand" },
   { icon: <BsEraser />, label: "eraser" },
   { icon: <FiDownload />, label: "download" },
+  { icon: <CiText />, label: "text" },
 ];
 
 interface RedoItemsProps {

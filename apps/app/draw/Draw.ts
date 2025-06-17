@@ -31,6 +31,13 @@ export class Draw {
   private opacity: number;
   private fillColor: string | null;
   private userId: string;
+  public setActiveInput: React.Dispatch<
+    React.SetStateAction<{
+      x: number;
+      y: number;
+      text: string;
+    } | null>
+  >;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -40,12 +47,20 @@ export class Draw {
     details: FormDataTypes,
     setDetails: React.Dispatch<React.SetStateAction<FormDataTypes>>,
     setSideBar: React.Dispatch<React.SetStateAction<boolean>>,
-    userId: string
+    userId: string,
+    setActiveInput: React.Dispatch<
+      React.SetStateAction<{
+        x: number;
+        y: number;
+        text: string;
+      } | null>
+    >
   ) {
     this.userId = userId;
     this.details = details;
     this.setDetails = setDetails;
     this.setSideBar = setSideBar;
+    this.setActiveInput = setActiveInput;
     this.strokeColor = theme === "dark" ? "#fff" : "#000";
     this.strokeWidth = 2;
     this.strokeStyle = "solid";
@@ -224,6 +239,24 @@ export class Draw {
     });
   };
 
+  public renderAllInput = (
+    textBoxes: {
+      id: string;
+      x: number;
+      y: number;
+      text: string;
+    }[]
+  ) => {
+    this.startHandler();
+    console.log("hello in the render all inputs", textBoxes);
+    textBoxes.forEach((txtBox) => {
+      console.log(txtBox);
+      this.context.fillStyle = "white";
+      this.context.font = "48px";
+      this.context.fillText(txtBox.text, txtBox.x, txtBox.y);
+    });
+  };
+
   public changeSelectedTool = (tool: selectedTools) => {
     this.selectedTools = tool;
     this.selectedId = null;
@@ -261,6 +294,7 @@ export class Draw {
 
   private mouseDownHandler = (e: MouseEvent | TouchEvent) => {
     this.isDrawing = true;
+    console.log("hello");
     let rect = this.canvas.getBoundingClientRect();
     if ("touches" in e) {
       this.startX = e.touches[0].clientX - rect.left;
@@ -556,6 +590,10 @@ export class Draw {
 
       this.setSideBar(shouldShowSidebar);
       this.renderAllShapes();
+    }
+
+    if (this.selectedTools === "text") {
+      this.setActiveInput({ x: this.startX, y: this.startY, text: "" });
     }
   };
 

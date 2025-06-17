@@ -24,6 +24,17 @@ const Canvas = ({
   const [selectedTools, setSelectedTools] = useState<selectedTools>("hand");
   const [sideBar, setSideBar] = useState<boolean>(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const [textBoxes, setTextBoxes] = useState<
+    { id: string; x: number; y: number; text: string }[]
+  >([]);
+
+  const [activeInput, setActiveInput] = useState<{
+    x: number;
+    y: number;
+    text: string;
+  } | null>(null);
 
   const { theme } = useContext(ThemeContext);
 
@@ -45,7 +56,8 @@ const Canvas = ({
         details,
         setDetails,
         setSideBar,
-        userId
+        userId,
+        setActiveInput
       );
       setDraw(draw);
 
@@ -72,6 +84,13 @@ const Canvas = ({
       draw.changeStyles(details);
     }
   }, [details]);
+
+  useEffect(() => {
+    if (draw) {
+      console.log("in the frontend");
+      draw.renderAllInput(textBoxes);
+    }
+  }, [textBoxes, activeInput]);
 
   return (
     <div className="w-full h-screen overflow-hidden relative">
@@ -132,6 +151,31 @@ const Canvas = ({
       {sideBar && <SideBar details={details} setDetails={setDetails} />}
 
       <canvas ref={canvasRef} />
+      {activeInput && (
+        <input
+          type="text"
+          autoFocus
+          ref={inputRef}
+          style={{
+            top: activeInput.y,
+            left: activeInput.x,
+          }}
+          onChange={(e) =>
+            setActiveInput({ ...activeInput, text: e.target.value })
+          }
+          onBlur={() => {
+            if (activeInput.text.trim() !== "") {
+              setTextBoxes((prev) => [
+                ...prev,
+                { ...activeInput, id: crypto.randomUUID() },
+              ]);
+            }
+            setActiveInput(null);
+          }}
+          value={activeInput.text}
+          className="absolute z-50 p-5 text-white"
+        />
+      )}
     </div>
   );
 };
