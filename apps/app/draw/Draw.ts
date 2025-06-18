@@ -112,7 +112,6 @@ export class Draw {
     this.ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        console.log(data);
 
         if (data.type === "shapes") {
           const shapes = JSON.parse(data.message);
@@ -144,7 +143,6 @@ export class Draw {
       roomSlug: this.roomSlug,
       userId: this.userId,
     };
-    console.log(data);
     this.ws.send(
       JSON.stringify({
         type: "shapes",
@@ -221,6 +219,7 @@ export class Draw {
       text: string;
     }[]
   ) => {
+    console.log(textBoxes);
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.existingShapes.map((item) => {
       this.context.globalAlpha = item.opacity;
@@ -243,6 +242,10 @@ export class Draw {
         this.drawLine(item);
       } else if (item.type === "triangle") {
         this.drawTriangle(item);
+      } else if (item.type === "text") {
+        this.context.fillStyle = "white";
+        this.context.font = "24px serif";
+        this.context.fillText(item.text, item.x, item.y);
       }
 
       if (item.fillColor) {
@@ -257,12 +260,29 @@ export class Draw {
 
       this.context.globalAlpha = 1;
     });
-    textBoxes?.forEach((txtBox) => {
-      console.log(txtBox);
+    textBoxes.forEach((txtBox) => {
       this.context.fillStyle = "white";
-      this.context.font = "32px serif";
+      this.context.font = "24px serif";
       this.context.fillText(txtBox.text, txtBox.x, txtBox.y);
     });
+  };
+
+  public updateTextBoxes = (
+    textBoxes: {
+      id: string;
+      x: number;
+      y: number;
+      text: string;
+    }[]
+  ) => {
+    this.textBoxes = textBoxes;
+    this.renderAllShapes(textBoxes);
+  };
+
+  public addingTextInExistingShapes = (input: Shapes) => {
+    this.existingShapes.push(input);
+    this.sendMessageViaWebSocket(input);
+    this.renderAllShapes(this.textBoxes);
   };
 
   public changeSelectedTool = (tool: selectedTools) => {
@@ -302,7 +322,6 @@ export class Draw {
 
   private mouseDownHandler = (e: MouseEvent | TouchEvent) => {
     this.isDrawing = true;
-    console.log("hello");
     let rect = this.canvas.getBoundingClientRect();
     if ("touches" in e) {
       this.startX = e.touches[0].clientX - rect.left;
@@ -406,7 +425,7 @@ export class Draw {
       this.sendMessageViaWebSocket(shape);
       this.existingShapes.push(shape);
     }
-    this.renderAllShapes(this.textBoxes);
+    // this.renderAllShapes(this.textBoxes);
   };
 
   private mouseMoveHandler = (e: MouseEvent | TouchEvent) => {
@@ -419,7 +438,7 @@ export class Draw {
         this.currentX = e.clientX - rect.left;
         this.currentY = e.clientY - rect.top;
       }
-
+      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.renderAllShapes(this.textBoxes);
 
       const currentOpacity = this.details.opacity || this.opacity;
@@ -462,6 +481,7 @@ export class Draw {
           existingShapes: this.existingShapes,
           currentX: this.currentX,
           currentY: this.currentY,
+          canvas: this.canvas,
         });
 
         if (result.distance === 0 && result.index !== null) {
@@ -513,6 +533,10 @@ export class Draw {
             selectedShape.x2 = this.currentX;
             selectedShape.y2 = this.currentY;
           }
+          if (selectedShape.type === "text") {
+            selectedShape.x = this.currentX;
+            selectedShape.y = this.currentY;
+          }
 
           this.ws.send(
             JSON.stringify({
@@ -544,11 +568,14 @@ export class Draw {
         existingShapes: this.existingShapes,
         currentX: this.currentX,
         currentY: this.currentY,
+        canvas: this.canvas,
       });
 
       let shouldShowSidebar = false;
 
+      console.log(result);
       if (result.distance === 0 && result.index !== null) {
+        console.log("hello");
         const originalColor =
           this.originalColors.get(result.index) || result.item.strokeColor;
 

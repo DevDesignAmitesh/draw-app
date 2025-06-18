@@ -98,6 +98,18 @@ export type Shapes =
       fillColor?: string;
       strokeStyle?: string;
       opacity: number;
+    }
+  | {
+      id?: string;
+      type: "text";
+      x: number;
+      y: number;
+      text: string;
+      width: number;
+      strokeColor: string;
+      fillColor?: string;
+      strokeStyle?: string;
+      opacity: number;
     };
 
 export function getDistanceToCircle({
@@ -278,14 +290,48 @@ export function getDistanceToTriangle({
   return Math.min(d1, d2, d3);
 }
 
+export function getDistanceToText({
+  canvasMouseX,
+  canvasMouseY,
+  textX,
+  textY,
+  textContent,
+  canvas,
+}: {
+  canvasMouseX: number;
+  canvasMouseY: number;
+  textX: number;
+  textY: number;
+  textContent: string;
+  canvas: HTMLCanvasElement;
+}) {
+  // Get canvas context to measure text
+  const context = canvas.getContext("2d")!;
+  context.font = "24px serif"; // Match font used in renderAllShapes
+  const textMetrics = context.measureText(textContent);
+  const textWidth = textMetrics.width;
+  const textHeight = 24; // Approximate height based on font size
+
+  // Treat text as a rectangle with top-left at (textX, textY)
+  const closestX = Math.max(textX, Math.min(canvasMouseX, textX + textWidth));
+  const closestY = Math.max(textY, Math.min(canvasMouseY, textY + textHeight));
+
+  const dx = canvasMouseX - closestX;
+  const dy = canvasMouseY - closestY;
+
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
 export function getSelectedShapeDistance({
   existingShapes,
   currentX,
   currentY,
+  canvas,
 }: {
   existingShapes: any[];
   currentX: number;
   currentY: number;
+  canvas: HTMLCanvasElement;
 }) {
   for (let i = 0; i < existingShapes.length; i++) {
     const item = existingShapes[i];
@@ -337,6 +383,20 @@ export function getSelectedShapeDistance({
         triX3: item.x3,
         triY3: item.y3,
       });
+    }
+
+    if (item.type === "text") {
+      console.log("in the utils");
+      console.log(item);
+      distance = getDistanceToText({
+        canvasMouseX: currentX,
+        canvasMouseY: currentY,
+        textX: item.x,
+        textY: item.y,
+        textContent: item.text,
+        canvas,
+      });
+      console.log(distance);
     }
 
     if (distance === 0) {

@@ -90,7 +90,7 @@ const Canvas = ({
   useEffect(() => {
     if (draw) {
       console.log("in the frontend");
-      draw.renderAllShapes(textBoxes);
+      draw.updateTextBoxes(textBoxes);
     }
   }, [textBoxes, activeInput]);
 
@@ -168,11 +168,21 @@ const Canvas = ({
             setActiveInput({ ...activeInput, text: e.target.value })
           }
           onBlur={() => {
-            if (activeInput.text.trim() !== "") {
-              setTextBoxes((prev) => [
-                ...prev,
-                { ...activeInput, id: uuidv4() },
-              ]);
+            if (activeInput && activeInput.text.trim() !== "") {
+              if (draw) {
+                draw.addingTextInExistingShapes({
+                  id: uuidv4(),
+                  type: "text",
+                  x: activeInput.x,
+                  y: activeInput.y,
+                  text: activeInput.text,
+                  width: 2, // Default width for text
+                  strokeColor: details.strokeColor || "#fff",
+                  fillColor: details.bgColor ?? "",
+                  strokeStyle: details.strokeStyle ?? "",
+                  opacity: details.opacity || 1,
+                });
+              }
             }
             setActiveInput(null);
           }}
