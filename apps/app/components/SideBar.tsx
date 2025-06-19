@@ -3,6 +3,7 @@ import React from "react";
 import ToggleBtn from "./ToggleBtn";
 
 const strokeColors = ["#E0E0E0", "#F87171", "#6EE7B7", "#FACC15", "#FB923C"];
+const fillColor = ["#E0E0E0", "#F87171", "#6EE7B7", "#FACC15", "#FB923C"];
 const bgColors = ["#121212", "#fff", "#10B981", "#F59E0B", "#111827"];
 const strokeWidths = [2, 4, 6];
 const strokeStyles = ["solid", "dashed", "dotted"];
@@ -35,6 +36,21 @@ const SideBar = ({
               className={`h-6 w-6 rounded-md border-2 ${details.strokeColor === color ? "border-[#E0DFFF] dark:border-[#4F4D6F]" : "border-transparent"} cursor-pointer`}
               style={{ backgroundColor: color }}
               onClick={() => setDetails({ ...details, strokeColor: color })}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Text Color */}
+      <div>
+        <p className="text-sm font-medium mb-2">Text Color</p>
+        <div className="flex gap-2 flex-wrap">
+          {fillColor.map((color) => (
+            <div
+              key={color}
+              className={`h-6 w-6 rounded-md border-2 ${details.textColor === color ? "border-[#E0DFFF] dark:border-[#4F4D6F]" : "border-transparent"} cursor-pointer`}
+              style={{ backgroundColor: color }}
+              onClick={() => setDetails({ ...details, textColor: color })}
             />
           ))}
         </div>

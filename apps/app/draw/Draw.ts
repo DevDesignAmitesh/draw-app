@@ -25,11 +25,13 @@ export class Draw {
   public strokeStyle: string;
   public strokeColor: string | null;
   public details: FormDataTypes;
-  private originalColors: Map<number, string> = new Map();
+  private originalText: Map<number, string> = new Map();
+  private originalStroke: Map<number, string> = new Map();
   private setDetails: React.Dispatch<React.SetStateAction<FormDataTypes>>;
   private setSideBar: React.Dispatch<React.SetStateAction<boolean>>;
   private opacity: number;
   private fillColor: string | null;
+  private textColor: string | null;
   private userId: string;
   public setActiveInput: React.Dispatch<
     React.SetStateAction<{
@@ -75,6 +77,7 @@ export class Draw {
     this.setSideBar = setSideBar;
     this.setActiveInput = setActiveInput;
     this.strokeColor = theme === "dark" ? "#fff" : "#000";
+    this.textColor = theme === "dark" ? "#fff" : "#000";
     this.strokeWidth = 2;
     this.strokeStyle = "solid";
     this.fillColor = theme === "dark" ? "#232329" : "#fff";
@@ -158,11 +161,24 @@ export class Draw {
       this.strokeColor = themeColor;
     }
 
+    if (this.textColor === "#000" || this.textColor === "#fff") {
+      this.textColor = themeColor;
+    }
+
     this.existingShapes.forEach((item, index) => {
-      const originalColor = item.strokeColor;
-      if (!this.originalColors.has(index)) {
-        if (originalColor === "#000" || originalColor === "#fff") {
-          item.strokeColor = this.strokeColor!;
+      if (item.type === "text") {
+        const originalTextColor = item.textColor;
+        if (!this.originalText.has(index)) {
+          if (originalTextColor === "#000" || originalTextColor === "#fff") {
+            item.textColor = this.textColor!;
+          }
+        }
+      } else {
+        const originalColor = item.strokeColor;
+        if (!this.originalStroke.has(index)) {
+          if (originalColor === "#000" || originalColor === "#fff") {
+            item.strokeColor = this.strokeColor!;
+          }
         }
       }
     });
@@ -179,6 +195,12 @@ export class Draw {
       const newStyle = data.strokeStyle ?? selectedShape.strokeStyle;
       const newOpacity = data.opacity ?? selectedShape.opacity;
       const newBg = data.bgColor ?? selectedShape.fillColor;
+
+      let newTextColor = "";
+      if (selectedShape.type === "text") {
+        newTextColor = data.textColor ?? selectedShape.textColor;
+        selectedShape.textColor = newTextColor;
+      }
 
       selectedShape.strokeColor = newColor;
       selectedShape.width = newWidth;
@@ -197,9 +219,14 @@ export class Draw {
         })
       );
 
-      this.originalColors.set(this.selectedId, newColor);
+      this.originalStroke.set(this.selectedId, newColor);
+      this.originalText.set(this.selectedId, newTextColor);
 
       selectedShape.strokeColor = "red";
+
+      if (selectedShape.type === "text") {
+        selectedShape.textColor = "red";
+      }
     }
 
     this.strokeColor = data.strokeColor ?? this.strokeColor;
@@ -207,6 +234,7 @@ export class Draw {
     this.strokeStyle = data.strokeStyle ?? this.strokeStyle;
     this.opacity = data.opacity ?? this.opacity;
     this.fillColor = data.bgColor ?? this.fillColor;
+    this.textColor = data.textColor ?? this.textColor;
 
     this.renderAllShapes(this.textBoxes);
   }
@@ -219,7 +247,6 @@ export class Draw {
       text: string;
     }[]
   ) => {
-    console.log(textBoxes);
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.existingShapes.map((item) => {
       this.context.globalAlpha = item.opacity;
@@ -243,9 +270,35 @@ export class Draw {
       } else if (item.type === "triangle") {
         this.drawTriangle(item);
       } else if (item.type === "text") {
-        this.context.fillStyle = "white";
+        this.context.fillStyle = item.textColor;
         this.context.font = "24px serif";
         this.context.fillText(item.text, item.x, item.y);
+      } else if (item.type === "img") {
+        if (!item.img && item.imgSrc) {
+          const image = new Image();
+          image.crossOrigin = "anonymous";
+          image.src = item.imgSrc;
+          image.onload = () => {
+            item.img = image;
+            this.renderAllShapes(this.textBoxes); // re-render when image is loaded
+          };
+          return; // Skip rendering for now
+        }
+
+        if (item.img instanceof HTMLImageElement && item.img.complete) {
+          this.context.drawImage(
+            item.img,
+            item.x,
+            item.y,
+            item.width,
+            item.height
+          );
+        } else {
+          console.warn(
+            "Image is not a valid HTMLImageElement or not loaded yet",
+            item
+          );
+        }
       }
 
       if (item.fillColor) {
@@ -259,11 +312,6 @@ export class Draw {
       this.context.closePath();
 
       this.context.globalAlpha = 1;
-    });
-    textBoxes.forEach((txtBox) => {
-      this.context.fillStyle = "white";
-      this.context.font = "24px serif";
-      this.context.fillText(txtBox.text, txtBox.x, txtBox.y);
     });
   };
 
@@ -282,6 +330,29 @@ export class Draw {
   public addingTextInExistingShapes = (input: Shapes) => {
     this.existingShapes.push(input);
     this.sendMessageViaWebSocket(input);
+    this.renderAllShapes(this.textBoxes);
+  };
+
+  public addingImageInExistingShapes = (
+    img: HTMLImageElement,
+    dropX: number,
+    dropY: number
+  ) => {
+    const data: Shapes = {
+      id: uuidv4(),
+      type: "img",
+      x: dropX,
+      y: dropY,
+      img,
+      imgSrc: img.src,
+      strokeColor: "",
+      opacity: 1,
+      width: 200,
+      height: 200,
+    };
+
+    this.existingShapes.push(data);
+    this.sendMessageViaWebSocket({ ...data, img: undefined });
     this.renderAllShapes(this.textBoxes);
   };
 
@@ -488,7 +559,7 @@ export class Draw {
           const last = this.existingShapes[result.index];
           this.existingShapes.splice(result.index, 1);
           this.undoShapes.push(last);
-          this.originalColors.delete(result.index);
+          this.originalStroke.delete(result.index);
           this.ws.send(
             JSON.stringify({
               type: "delete_shape",
@@ -537,6 +608,10 @@ export class Draw {
             selectedShape.x = this.currentX;
             selectedShape.y = this.currentY;
           }
+          if (selectedShape.type === "img") {
+            selectedShape.x = this.currentX;
+            selectedShape.y = this.currentY;
+          }
 
           this.ws.send(
             JSON.stringify({
@@ -573,52 +648,91 @@ export class Draw {
 
       let shouldShowSidebar = false;
 
-      console.log(result);
       if (result.distance === 0 && result.index !== null) {
-        console.log("hello");
-        const originalColor =
-          this.originalColors.get(result.index) || result.item.strokeColor;
+        let originalTextColor = "";
+        let originalStrokeColor = "";
+        if (result.item.type === "text") {
+          originalTextColor =
+            this.originalText.get(result.index) || result.item.textColor;
+        } else {
+          originalStrokeColor =
+            this.originalStroke.get(result.index) || result.item.strokeColor;
+        }
 
         this.setDetails(() => ({
-          strokeColor: originalColor,
+          strokeColor: originalStrokeColor,
           strokeWidth: result.item.width,
           strokeStyle: result.item.strokeStyle,
           opacity: result.item.opacity,
           bgColor: result.item.fillColor,
+          textColor: originalTextColor,
         }));
 
         if (this.selectedId === result.index) {
-          result.item.strokeColor = originalColor;
-          this.originalColors.delete(result.index);
+          if (result.item.type === "text") {
+            result.item.textColor = originalTextColor;
+            this.originalText.delete(result.index);
+          } else {
+            result.item.strokeColor = originalStrokeColor;
+            this.originalStroke.delete(result.index);
+          }
           this.selectedId = null;
           shouldShowSidebar = false;
         } else {
           this.existingShapes.forEach((shape, index) => {
-            if (index !== result.index && this.originalColors.has(index)) {
+            if (shape.type === "text") {
+              if (index !== result.index && this.originalText.has(index)) {
+                const prevOriginalTextColor =
+                  this.originalText.get(index) || this.textColor!;
+                shape.textColor = prevOriginalTextColor;
+                this.originalText.delete(index);
+              }
+            } else if (
+              index !== result.index &&
+              this.originalStroke.has(index)
+            ) {
               const prevOriginalColor =
-                this.originalColors.get(index) || this.strokeColor!;
+                this.originalStroke.get(index) || this.strokeColor!;
               shape.strokeColor = prevOriginalColor;
-              this.originalColors.delete(index);
+              this.originalStroke.delete(index);
             }
           });
 
-          if (!this.originalColors.has(result.index)) {
-            this.originalColors.set(result.index, result.item.strokeColor);
+          if (
+            !this.originalStroke.has(result.index) ||
+            !this.originalText.has(result.index)
+          ) {
+            if (result.item.type === "text") {
+              this.originalText.set(result.index, result.item.textColor);
+            } else {
+              this.originalStroke.set(result.index, result.item.strokeColor);
+            }
+          }
+          if (result.item.type === "text") {
+            result.item.textColor = "red";
+          } else {
+            result.item.strokeColor = "red";
           }
 
-          result.item.strokeColor = "red";
           this.selectedId = result.index;
           shouldShowSidebar = true;
         }
       } else {
         this.existingShapes.forEach((shape, index) => {
-          if (this.originalColors.has(index)) {
-            const originalColor =
-              this.originalColors.get(index) || this.strokeColor!;
-            shape.strokeColor = originalColor;
+          if (shape.type === "text") {
+            if (this.originalText.has(index)) {
+              const originalTextColor =
+                this.originalText.get(index) || this.textColor!;
+              shape.textColor = originalTextColor;
+            }
+          } else if (this.originalStroke.has(index)) {
+            const originalStrokeColor =
+              this.originalStroke.get(index) || this.strokeColor!;
+            shape.strokeColor = originalStrokeColor;
           }
         });
-        this.originalColors.clear();
+        this.originalStroke.clear();
+        this.originalText.clear();
         this.selectedId = null;
         shouldShowSidebar = false;
       }
@@ -708,7 +822,7 @@ export class Draw {
 
     if (this.selectedId === this.existingShapes.length) {
       this.selectedId = null;
-      this.originalColors.clear();
+      this.originalStroke.clear();
     }
 
     this.renderAllShapes(this.textBoxes);

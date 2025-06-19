@@ -31,6 +31,24 @@ const Canvas = ({
     { id: string; x: number; y: number; text: string }[]
   >([]);
 
+  const handleDrop = (e: React.DragEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const rect = e.currentTarget.getBoundingClientRect();
+
+    const dropX = e.clientX - rect.left;
+    const dropY = e.clientY - rect.top;
+
+    const imgUrl = e.dataTransfer.getData("URL");
+    const img = new Image(100, 100);
+    img.src = imgUrl;
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      if (draw) {
+        draw.addingImageInExistingShapes(img, dropX, dropY);
+      }
+    };
+  };
+
   const [activeInput, setActiveInput] = useState<{
     x: number;
     y: number;
@@ -41,6 +59,7 @@ const Canvas = ({
 
   const [details, setDetails] = useState<FormDataTypes>({
     strokeColor: theme === "dark" ? "#fff" : "#000",
+    textColor: theme === "dark" ? "#fff" : "#000",
     bgColor: theme === "dark" ? "#121212" : "#fff",
     strokeWidth: 2,
     strokeStyle: "solid",
@@ -89,7 +108,6 @@ const Canvas = ({
 
   useEffect(() => {
     if (draw) {
-      console.log("in the frontend");
       draw.updateTextBoxes(textBoxes);
     }
   }, [textBoxes, activeInput]);
@@ -152,7 +170,13 @@ const Canvas = ({
 
       {sideBar && <SideBar details={details} setDetails={setDetails} />}
 
-      <canvas ref={canvasRef} />
+      <canvas
+        width={window.innerWidth}
+        height={window.innerHeight}
+        ref={canvasRef}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => handleDrop(e)}
+      />
 
       {activeInput && (
         <input
@@ -179,8 +203,11 @@ const Canvas = ({
                   width: 2, // Default width for text
                   strokeColor: details.strokeColor || "#fff",
                   fillColor: details.bgColor ?? "",
-                  strokeStyle: details.strokeStyle ?? "",
+                  strokeStyle:
+                    (details.strokeStyle ?? theme === "dark") ? "#fff" : "#000",
                   opacity: details.opacity || 1,
+                  textColor:
+                    (details.textColor ?? theme === "dark") ? "#fff" : "#000",
                 });
               }
             }

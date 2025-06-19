@@ -17,7 +17,8 @@ export type selectedTools =
   | "undo"
   | "redo"
   | "download"
-  | "text";
+  | "text"
+  | "img";
 
 interface TopBarItemProps {
   icon: ReactElement;
@@ -107,12 +108,43 @@ export type Shapes =
       text: string;
       width: number;
       strokeColor: string;
+      textColor: string;
+      fillColor?: string;
+      strokeStyle?: string;
+      opacity: number;
+    }
+  | {
+      id?: string;
+      type: "img";
+      x: number;
+      y: number;
+      imgSrc: string;
+      img: HTMLImageElement | undefined;
+      width: number;
+      height: number;
+      strokeColor: string;
       fillColor?: string;
       strokeStyle?: string;
       opacity: number;
     };
 
 export function getDistanceToCircle({
+  canvasMouseX,
+  canvasMouseY,
+  mouseX,
+  mouseY,
+}: {
+  canvasMouseX: number;
+  canvasMouseY: number;
+  mouseX: number;
+  mouseY: number;
+}) {
+  let dx = canvasMouseX - mouseX;
+  let dy = canvasMouseY - mouseY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+export function getDistanceToImage({
   canvasMouseX,
   canvasMouseY,
   mouseX,
@@ -328,7 +360,7 @@ export function getSelectedShapeDistance({
   currentY,
   canvas,
 }: {
-  existingShapes: any[];
+  existingShapes: Shapes[];
   currentX: number;
   currentY: number;
   canvas: HTMLCanvasElement;
@@ -386,8 +418,6 @@ export function getSelectedShapeDistance({
     }
 
     if (item.type === "text") {
-      console.log("in the utils");
-      console.log(item);
       distance = getDistanceToText({
         canvasMouseX: currentX,
         canvasMouseY: currentY,
@@ -396,7 +426,17 @@ export function getSelectedShapeDistance({
         textContent: item.text,
         canvas,
       });
-      console.log(distance);
+      if (distance <= 15) distance = 0;
+    }
+
+    if (item.type === "img") {
+      distance = getDistanceToImage({
+        canvasMouseX: currentX,
+        canvasMouseY: currentY,
+        mouseX: item.x,
+        mouseY: item.y,
+      });
+      if (distance <= 300) distance = 0;
     }
 
     if (distance === 0) {
@@ -419,6 +459,7 @@ export function getSelectedShapeDistance({
 
 export interface FormDataTypes {
   strokeColor?: string | null;
+  textColor?: string | null;
   bgColor?: string | null;
   strokeWidth?: number | null;
   strokeStyle?: string | null;
