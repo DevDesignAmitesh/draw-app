@@ -11,6 +11,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import SideBar from "./SideBar";
 import { ThemeContext } from "@/lib/ThemeProvider";
 import { v4 as uuidv4 } from "uuid";
+import ToggleBtn from "./ToggleBtn";
 
 const Canvas = ({
   roomSlug,
@@ -64,6 +65,7 @@ const Canvas = ({
     strokeWidth: 2,
     strokeStyle: "solid",
     opacity: 1,
+    type: null,
   });
 
   useEffect(() => {
@@ -98,13 +100,13 @@ const Canvas = ({
     if (draw) {
       draw.changeTheme(theme);
     }
-  }, [theme]);
+  }, [theme, details]);
 
   useEffect(() => {
     if (draw) {
       draw.changeStyles(details);
     }
-  }, [details]);
+  }, [details, theme]);
 
   useEffect(() => {
     if (draw) {
@@ -138,6 +140,7 @@ const Canvas = ({
             </button>
           );
         })}
+        <ToggleBtn />
       </div>
 
       {/* left bottom bar */}

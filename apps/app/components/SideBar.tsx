@@ -22,10 +22,6 @@ const SideBar = ({
 
   return (
     <div className="absolute left-5 top-12 w-[220px] rounded-xl dark:bg-[#232329] bg-white dark:text-[#D1D1E2] text-[#29294A] border border-neutral-600 p-4 flex flex-col justify-start items-start gap-5 shadow-lg">
-      <div className="w-full flex flex-col justify-center items-start">
-        <p className="text-sm font-medium mb-3">App Theme</p>
-        <ToggleBtn />
-      </div>
       {/* Stroke */}
       <div>
         <p className="text-sm font-medium mb-2">Stroke</p>
@@ -42,34 +38,40 @@ const SideBar = ({
       </div>
 
       {/* Text Color */}
-      <div>
-        <p className="text-sm font-medium mb-2">Text Color</p>
-        <div className="flex gap-2 flex-wrap">
-          {fillColor.map((color) => (
-            <div
-              key={color}
-              className={`h-6 w-6 rounded-md border-2 ${details.textColor === color ? "border-[#E0DFFF] dark:border-[#4F4D6F]" : "border-transparent"} cursor-pointer`}
-              style={{ backgroundColor: color }}
-              onClick={() => setDetails({ ...details, textColor: color })}
-            />
-          ))}
+      {details.type === "text" && (
+        <div>
+          <p className="text-sm font-medium mb-2">Text Color</p>
+          <div className="flex gap-2 flex-wrap">
+            {fillColor.map((color) => (
+              <div
+                key={color}
+                className={`h-6 w-6 rounded-md border-2 ${details.textColor === color ? "border-[#E0DFFF] dark:border-[#4F4D6F]" : "border-transparent"} cursor-pointer`}
+                style={{ backgroundColor: color }}
+                onClick={() => setDetails({ ...details, textColor: color })}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Background */}
-      <div>
-        <p className="text-sm font-medium mb-2">Background</p>
-        <div className="flex gap-2 flex-wrap">
-          {bgColors.map((color) => (
-            <div
-              key={color}
-              className={`h-6 w-6 rounded-md border-2 ${details.bgColor === color ? "border-[#E0DFFF] dark:border-[#4F4D6F]" : "border-transparent"} cursor-pointer`}
-              style={{ backgroundColor: color }}
-              onClick={() => setDetails({ ...details, bgColor: color })}
-            />
-          ))}
+      {(details.type === "square" ||
+        details.type === "circle" ||
+        details.type === "triangle") && (
+        <div>
+          <p className="text-sm font-medium mb-2">Background</p>
+          <div className="flex gap-2 flex-wrap">
+            {bgColors.map((color) => (
+              <div
+                key={color}
+                className={`h-6 w-6 rounded-md border-2 ${details.bgColor === color ? "border-[#E0DFFF] dark:border-[#4F4D6F]" : "border-transparent"} cursor-pointer`}
+                style={{ backgroundColor: color }}
+                onClick={() => setDetails({ ...details, bgColor: color })}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Stroke Width */}
       <div>

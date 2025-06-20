@@ -9,8 +9,9 @@ const ToggleBtn = () => {
 
   return (
     <button
+      title="theme"
       onClick={toggleTheme}
-      className="flex justify-center items-center rounded-full text-text cursor-pointer transition-all duration-300"
+      className={`flex justify-center items-center text-text cursor-pointer transition-all duration-300 p-3 rounded bg-[#E0DFFF] dark:bg-[#4F4D6F] hover:bg-[#E0DFFF] dark:hover:bg-[#4F4D6F] `}
     >
       {theme === "light" ? (
         <IoMoonOutline size={22} />

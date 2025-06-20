@@ -18,7 +18,8 @@ export type selectedTools =
   | "redo"
   | "download"
   | "text"
-  | "img";
+  | "img"
+  ;
 
 interface TopBarItemProps {
   icon: ReactElement;
@@ -464,6 +465,7 @@ export interface FormDataTypes {
   strokeWidth?: number | null;
   strokeStyle?: string | null;
   opacity?: number | null;
+  type: selectedTools | null
 }
 
 export const HTTP_URL = "http://localhost:5000/api/v1";

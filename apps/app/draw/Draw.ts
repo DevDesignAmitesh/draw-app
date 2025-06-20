@@ -32,6 +32,7 @@ export class Draw {
   private opacity: number;
   private fillColor: string | null;
   private textColor: string | null;
+  private bgColor: string | null;
   private userId: string;
   public setActiveInput: React.Dispatch<
     React.SetStateAction<{
@@ -78,6 +79,7 @@ export class Draw {
     this.setActiveInput = setActiveInput;
     this.strokeColor = theme === "dark" ? "#fff" : "#000";
     this.textColor = theme === "dark" ? "#fff" : "#000";
+    this.bgColor = theme === "dark" ? "#121212" : "#fff";
     this.strokeWidth = 2;
     this.strokeStyle = "solid";
     this.fillColor = theme === "dark" ? "#232329" : "#fff";
@@ -156,6 +158,7 @@ export class Draw {
 
   public changeTheme(theme: string) {
     const themeColor = theme === "dark" ? "#fff" : "#000";
+    const themeBgColor = theme === "dark" ? "#121212" : "#fff";
 
     if (this.strokeColor === "#000" || this.strokeColor === "#fff") {
       this.strokeColor = themeColor;
@@ -163,6 +166,10 @@ export class Draw {
 
     if (this.textColor === "#000" || this.textColor === "#fff") {
       this.textColor = themeColor;
+    }
+
+    if (this.bgColor === "#121212" || this.bgColor === "#fff") {
+      this.bgColor = themeBgColor;
     }
 
     this.existingShapes.forEach((item, index) => {
@@ -178,6 +185,7 @@ export class Draw {
         if (!this.originalStroke.has(index)) {
           if (originalColor === "#000" || originalColor === "#fff") {
             item.strokeColor = this.strokeColor!;
+            item.fillColor = this.bgColor!;
           }
         }
       }
@@ -496,7 +504,6 @@ export class Draw {
       this.sendMessageViaWebSocket(shape);
       this.existingShapes.push(shape);
     }
-    // this.renderAllShapes(this.textBoxes);
   };
 
   private mouseMoveHandler = (e: MouseEvent | TouchEvent) => {
@@ -666,6 +673,7 @@ export class Draw {
           opacity: result.item.opacity,
           bgColor: result.item.fillColor,
           textColor: originalTextColor,
+          type: result.item.type,
         }));
 
         if (this.selectedId === result.index) {
