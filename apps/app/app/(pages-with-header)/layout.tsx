@@ -11,8 +11,9 @@ export default async function Layout({
 
   return (
     <>
-      <Header userId={userId} />
-      <div className="lg:px-20 px-10">{children}</div>
+      {/* <Header userId={userId} />
+      <div className="lg:px-20 px-10">{children}</div> */}
+      {children}
     </>
   );
 }
