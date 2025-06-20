@@ -19,6 +19,7 @@
 // export default page;
 
 import Header from "@/components/new/Header";
+import Five from "@/components/new/header-decoration/five";
 import Four from "@/components/new/header-decoration/Four";
 import One from "@/components/new/header-decoration/one";
 import Three from "@/components/new/header-decoration/three";
@@ -35,6 +36,7 @@ const page = () => {
       <Two />
       <Three />
       <Four />
+      <Five />
     </div>
   );
 };
