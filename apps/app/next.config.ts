@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
       {
         hostname: "marketplace.atlassian.com",
       },
+      {
+        hostname: "images.ctfassets.net",
+      },
     ],
   },
 };

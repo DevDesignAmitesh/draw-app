@@ -4,10 +4,11 @@ import { LandingPageHeader } from "@/lib/ui/utils";
 import Button from "./Button";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import HeaderDropDown from "./HeaderDropDown";
+import TwoBtn from "./TwoBtn";
 
 const Header = () => {
   return (
-    <header className="w-full flex justify-between items-center px-9 py-7">
+    <header className="fixed bg-white z-[50] top-0 right-0 left-0 w-full flex justify-between items-center px-9 py-7">
       <div className="flex justify-center items-center gap-18">
         <Logo />
         <div className="flex relative justify-center capitalize text-[#030064] items-center gap-6 text-[16px]">
@@ -31,10 +32,7 @@ const Header = () => {
           ))}
         </div>
       </div>
-      <div className="flex justify-center items-center gap-3">
-        <Button href="/signin" variant="white" label="Sign in" />
-        <Button href="/signup" variant="blue" label="Sign up" />
-      </div>
+      <TwoBtn />
     </header>
   );
 };

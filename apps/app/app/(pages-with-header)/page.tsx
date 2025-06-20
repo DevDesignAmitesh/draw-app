@@ -17,26 +17,17 @@
 // };
 
 // export default page;
-
-import Header from "@/components/new/Header";
-import Five from "@/components/new/header-decoration/five";
-import Four from "@/components/new/header-decoration/Four";
-import One from "@/components/new/header-decoration/one";
-import Three from "@/components/new/header-decoration/three";
-import Two from "@/components/new/header-decoration/two";
 import Hero from "@/components/new/Hero";
+import ImageWithPartner from "@/components/new/ImageWithPartner";
+import SayHi from "@/components/new/SayHi";
 import React from "react";
 
 const page = () => {
   return (
-    <div className="relative w-full min-h-screen bg-[#F8FFF8]">
-      <Header />
+    <div className="w-full min-h-screen">
       <Hero />
-      <One />
-      <Two />
-      <Three />
-      <Four />
-      <Five />
+      <ImageWithPartner />
+      <SayHi />
     </div>
   );
 };

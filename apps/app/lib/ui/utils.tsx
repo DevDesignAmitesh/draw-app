@@ -2,10 +2,6 @@ interface LandingPageHeader {
   label: string;
 }
 
-interface HeaderDropDown {
-  label: string;
-}
-
 export const LandingPageHeader: LandingPageHeader[] = [
   {
     label: "pricing",
@@ -20,6 +16,10 @@ export const LandingPageHeader: LandingPageHeader[] = [
     label: "resources",
   },
 ];
+
+interface HeaderDropDown {
+  label: string;
+}
 
 export const HeaderDropDownUtils: HeaderDropDown[] = [
   {
@@ -36,5 +36,39 @@ export const HeaderDropDownUtils: HeaderDropDown[] = [
   },
   {
     label: "blog",
+  },
+];
+
+interface CompanyCurousel {
+  src: string;
+}
+
+export const CompanyCurousel: CompanyCurousel[] = [
+  {
+    src: "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/lp-cms/media/Wix_logo.svg",
+  },
+  {
+    src: "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/lp-cms/media/Odoo_logo.svg",
+  },
+  {
+    src: "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/lp-cms/media/Microsoft_logo.svg",
+  },
+  {
+    src: "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/lp-cms/media/netflix-logo.svg",
+  },
+  {
+    src: "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/lp-cms/media/Meta-logo.svg",
+  },
+  {
+    src: "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/lp-cms/media/Swappie_logo.svg",
+  },
+  {
+    src: "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/lp-cms/media/Linde_logo.svg",
+  },
+  {
+    src: "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/lp-cms/media/Rokt_logo.svg",
+  },
+  {
+    src: "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/lp-cms/media/Memfault_logo.svg",
   },
 ];
