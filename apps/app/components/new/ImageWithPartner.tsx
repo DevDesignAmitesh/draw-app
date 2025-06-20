@@ -12,7 +12,7 @@ const ImageWithPartner = () => {
         src={"/bottom-hero.png"}
         className="z-[50] object-cover object-center shadow-md"
       />
-      <div className="w-full flex flex-col justify-center items-center gap-5 py-20">
+      <div className="w-full flex flex-col justify-center items-center gap-5 pb-20 pt-30">
         <p className="text-[#030064] text-[22px] tracking-wider ">
           Trusted by the largest companies in the world
         </p>
