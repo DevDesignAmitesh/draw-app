@@ -140,3 +140,31 @@ export const FooterListingItems: FooterListingItems[] = [
     },
   },
 ];
+
+interface ImageCarouselItems {
+  label: string;
+  img: string;
+}
+
+export const ImageCarouselItems: ImageCarouselItems[] = [
+  {
+    label: "Advanced sharing options",
+    img: "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/lp-cms/media/Advanced%20sharing%20options.svg",
+  },
+  {
+    label: "Live presentations",
+    img: "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/lp-cms/media/Live%20presentations.svg",
+  },
+  {
+    label: "Extended team collaboration",
+    img: "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/lp-cms/media/Extended%20team%20collaboration.svg",
+  },
+  {
+    label: "Cloud workspace management",
+    img: "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/lp-cms/media/Cloud%20workspace%20management.svg",
+  },
+  {
+    label: "Upgraded generative Ai",
+    img: "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/lp-cms/media/Upgraded_generative_AI.svg",
+  },
+];

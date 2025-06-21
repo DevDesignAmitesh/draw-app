@@ -24,6 +24,7 @@ import Testimonials from "@/components/new/Testimonials";
 import TextAndVideoComp from "@/components/new/TextAndVideoComp";
 import Free from "@/components/new/Free";
 import Footer from "@/components/new/Footer";
+import PlusFeature from "@/components/new/PlusFeature";
 
 const page = () => {
   const ImageWithPartner = dynamic(
@@ -39,6 +40,7 @@ const page = () => {
       <TextAndVideoComp />
       <Testimonials />
       <Free />
+      <PlusFeature />
       <Footer />
     </div>
   );
