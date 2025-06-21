@@ -7,6 +7,8 @@ import Link from "next/link";
 import axios from "axios";
 import { HTTP_URL } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import Logo from "./new/Logo";
+import ImageCarousel from "./new/ImageCarousel ";
 
 const AuthScreen = ({ isSignin }: { isSignin?: boolean }) => {
   const [name, setName] = useState<string>("");
@@ -88,48 +90,54 @@ const AuthScreen = ({ isSignin }: { isSignin?: boolean }) => {
   const alternateAction = isSignin ? "Sign up" : "Sign in";
 
   return (
-    <div className="w-full h-screen flex flex-col justify-center items-center p-10">
-      <h1 className="text-3xl font-bold text-center capitalize dark:text-white text-black">
-        {headingText}
-      </h1>
-      <p className="text-[15px] mt-2 text-center text-neutral-600 dark:text-neutral-300">
-        {subText}
-      </p>
-      <div className="p-5 rounded-md border-2 border-neutral-600 dark:border-neutral-300 lg:w-[450px] w-[350px] mt-4 flex flex-col justify-center items-center gap-4">
-        {!isSignin && (
-          <InputBox
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            label="name"
-          />
-        )}
-        <InputBox
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          type="email"
-          label="email"
-        />
-        <InputBox
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          type="password"
-          label="password"
-        />
-        <SuperBtn
-          variant="primary"
-          className="w-full mt-2"
-          label={buttonLabel}
-          onClick={isSignin ? handleSignin : handleSignup}
-          disabled={loading}
-        />
-        <p className="text-neutral-600 dark:text-neutral-300 capitalize text-[14px]">
-          {alternateText}{" "}
-          <Link href={isSignin ? "/signup" : "/signin"}>
-            <span className="text-black hover:underline dark:text-white capitalize cursor-pointer">
-              {alternateAction}
-            </span>
-          </Link>
-        </p>
+    <div className="w-full h-screen bg-[#121212] flex flex-col gap-16 justify-center items-center p-10">
+      <Logo src="https://plus.excalidraw.com/images/logo-dark.svg" />
+      <div className="flex w-full justify-center gap-60 items-center">
+        <ImageCarousel />
+        <div className="flex flex-col justify-center items-center">
+          <h1 className="text-3xl tracking-wider font-bold text-center capitalize dark:text-white text-black">
+            {headingText}
+          </h1>
+          <p className="text-[15px] tracking-wider mt-2 text-center text-neutral-600 dark:text-neutral-300">
+            {subText}
+          </p>
+          <div className="p-5 rounded-md border-2 border-neutral-600 dark:border-neutral-300 lg:w-[450px] w-[350px] mt-4 flex flex-col justify-center items-center gap-4">
+            {!isSignin && (
+              <InputBox
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                label="name"
+              />
+            )}
+            <InputBox
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              label="email"
+            />
+            <InputBox
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type="password"
+              label="password"
+            />
+            <SuperBtn
+              variant="primary"
+              className="w-full mt-2"
+              label={buttonLabel}
+              onClick={isSignin ? handleSignin : handleSignup}
+              disabled={loading}
+            />
+            <p className="text-neutral-600 tracking-wider dark:text-neutral-300 capitalize text-[14px]">
+              {alternateText}{" "}
+              <Link href={isSignin ? "/signup" : "/signin"}>
+                <span className="text-black tracking-wider hover:underline dark:text-white capitalize cursor-pointer">
+                  {alternateAction}
+                </span>
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

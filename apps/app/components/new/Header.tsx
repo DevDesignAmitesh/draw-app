@@ -3,8 +3,8 @@ import Logo from "./Logo";
 import { LandingPageHeader } from "@/lib/ui/utils";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import HeaderDropDown from "./HeaderDropDown";
-import TwoBtn from "./TwoBtn";
 import Button from "./Button";
+import TwoBtn from "./TwoBtn";
 
 const Header = () => {
   return (
@@ -32,7 +32,7 @@ const Header = () => {
           ))}
         </div>
       </div>
-      <TwoBtn className="lg:block hidden" />
+      <TwoBtn className="lg:flex hidden" />
       <Button
         className="block lg:hidden"
         href="/signin"

@@ -21,7 +21,7 @@ const ImageCarousel = () => {
   }, []);
 
   return (
-    <div className="flex flex-col justify-center lg:mt-0 mt-10 items-center gap-5 text-[#030064]">
+    <div className="flex flex-col justify-center lg:mt-0 mt-10 items-center gap-5 dark:text-white text-[#030064]">
       {/* Animated wrapper */}
       <div
         className={`transition-all duration-700 ease-in-out transform ${
@@ -53,7 +53,7 @@ const ImageCarousel = () => {
               }, 200);
             }}
             className={`h-3 w-3 rounded-full transition-all duration-300 ${
-              i === index ? "bg-[#030064]" : "bg-gray-300"
+              i === index ? "dark:bg-white bg-[#030064]" : "bg-gray-300 dark:bg-neutral-700"
             }`}
           />
         ))}

@@ -26,7 +26,7 @@ const SuperBtn = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-md py-2 px-4 shadow-md capitalize cursor-pointer text-[14px] ${variant === "primary" ? primaryStyles : secondaryStyles} ${className}`}
+      className={`rounded-md py-2 px-4 shadow-md tracking-wider capitalize cursor-pointer text-[14px] ${variant === "primary" ? primaryStyles : secondaryStyles} ${className}`}
     >
       {label}
     </button>

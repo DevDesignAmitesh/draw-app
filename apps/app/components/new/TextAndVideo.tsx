@@ -57,10 +57,10 @@ const TextAndVideo = ({
         </div>
       ) : (
         <div className="w-full h-fit flex flex-col justify-start items-start text-[#030064] gap-2">
-          <p className="lg:text-5xl text-3xl font-medium">
+          <div className="lg:text-5xl text-3xl font-medium">
             {title} <span className="p-2 bg-[#D3FFD2] rounded-md">{label}</span>
             <p className="lg:text-[18px] text-[15px] mt-6">{description}</p>
-          </p>
+          </div>
           <TwoBtn className="mt-2" />
         </div>
       )}

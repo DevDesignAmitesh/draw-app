@@ -32,7 +32,11 @@ const Footer = () => {
         </div>
         <div className="flex md:justify-center justify-start items-start flex-wrap gap-16">
           {FooterListingItems.map((item) => (
-            <FooterListing data={item.data.item} label={item.label} />
+            <FooterListing
+              key={item.label}
+              data={item.data.item}
+              label={item.label}
+            />
           ))}
         </div>
       </div>

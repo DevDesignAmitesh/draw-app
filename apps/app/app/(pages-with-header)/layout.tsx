@@ -11,11 +11,13 @@ export default async function Layout({
   console.log("in the pages with header layout", userId);
 
   return (
-    <body className="bg-[#F8FFF8]">
+    <div className="bg-[#F8FFF8] dark:bg-[#121212]">
       {/* <Header userId={userId} />
       <div className="lg:px-20 px-10">{children}</div> */}
-      <Header />
-      {children}
-    </body>
+      <>
+        <Header />
+        {children}
+      </>
+    </div>
   );
 }

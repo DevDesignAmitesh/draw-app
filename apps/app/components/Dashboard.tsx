@@ -12,7 +12,7 @@ const Dashboard = async () => {
   }
 
   return (
-    <div className="w-full min-h-[80vh] max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center place-content-center">
+    <div className="w-full min-h-[80vh] max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-30 px-10">
       {cards.map((card) => (
         <Link
           href={`/canvas/${card.slug}`}

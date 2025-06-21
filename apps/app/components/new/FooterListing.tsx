@@ -13,7 +13,10 @@ const FooterListing = ({ label, data }: FooterListing) => {
       <>
         <h1 className="font-semibold text-[18px]">{label}</h1>
         {data.map((item) => (
-          <p className="text-[13px] mb-1 hover:underline cursor-pointer">
+          <p
+            key={item}
+            className="text-[13px] mb-1 hover:underline cursor-pointer"
+          >
             {item}
           </p>
         ))}
