@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
       {
         hostname: "images.ctfassets.net",
       },
+      {
+        hostname: "excalidraw.nyc3.cdn.digitaloceanspaces.com",
+      },
     ],
   },
 };

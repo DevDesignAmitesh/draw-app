@@ -1,6 +1,9 @@
 import Image from "next/image";
 import React from "react";
 import TwoBtn from "./TwoBtn";
+import CardComp from "./CardComp";
+
+export type CardType = "long-text" | "normal" | "twitter";
 
 interface TextAndVideo {
   title: string;
@@ -9,7 +12,7 @@ interface TextAndVideo {
   videoUrl?: string;
   label: string;
   isBiglayout: boolean;
-  type: "long-text" | "normal" | "twitter";
+  type: CardType;
 }
 
 const TextAndVideo = ({
@@ -22,7 +25,11 @@ const TextAndVideo = ({
   isBiglayout,
 }: TextAndVideo) => {
   return (
-    <div className="w-full min-h-screen flex justify-center items-start px-20 py-30 gap-5">
+    <div
+      className={`w-full bg-white ${isBiglayout ? "min-h-screen" : "h-auto"} flex justify-center items-start px-40 ${
+        label === "no sign-up" ? "py-30" : "py-20"
+      } gap-5`}
+    >
       <div className="flex flex-col justify-center items-center">
         <Image height={70} width={70} alt="some-img" src={leftImg} />
         <div
@@ -31,9 +38,11 @@ const TextAndVideo = ({
       </div>
       {isBiglayout ? (
         <div className="w-full h-screen flex flex-col justify-start items-start text-[#030064] gap-2">
-          <span className="p-2 bg-[#D3FFD2] rounded-md">{label}</span>
-          <p className="text-7xl font-medium">{title}</p>
-          <p className="text-xl">{description}</p>
+          <span className="p-2 bg-[#D3FFD2] rounded-md text-[15px]">
+            {label}
+          </span>
+          <p className="text-5xl font-medium">{title}</p>
+          <p className="text-[18px]">{description}</p>
           <video
             src={videoUrl}
             loop
@@ -41,12 +50,16 @@ const TextAndVideo = ({
             autoPlay
             className="w-full h-full object-cover rounded-lg mt-4"
           />
+          <div className="w-full grid grid-cols-3 gap-5 mt-4">
+            <CardComp type={type} />
+            <CardComp type={type} />
+          </div>
         </div>
       ) : (
         <div className="w-full h-fit flex flex-col justify-start items-start text-[#030064] gap-2">
-          <p className="text-7xl font-medium">
+          <p className="text-5xl font-medium">
             {title} <span className="p-2 bg-[#D3FFD2] rounded-md">{label}</span>
-            <p className="text-xl mt-6">{description}</p>
+            <p className="text-[18px] mt-6">{description}</p>
           </p>
           <TwoBtn className="mt-2" />
         </div>

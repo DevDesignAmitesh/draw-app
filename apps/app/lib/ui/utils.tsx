@@ -1,3 +1,8 @@
+import { ReactElement } from "react";
+import { CiLinkedin } from "react-icons/ci";
+import { FaXTwitter } from "react-icons/fa6";
+import { LuGithub } from "react-icons/lu";
+
 interface LandingPageHeader {
   label: string;
 }
@@ -70,5 +75,68 @@ export const CompanyCurousel: CompanyCurousel[] = [
   },
   {
     src: "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/lp-cms/media/Memfault_logo.svg",
+  },
+];
+
+interface footerPublicLink {
+  icon: ReactElement;
+  href: string;
+}
+
+export const footerPublicLink: footerPublicLink[] = [
+  {
+    icon: <FaXTwitter size={20} />,
+    href: "12",
+  },
+  {
+    icon: <CiLinkedin size={20} />,
+    href: "23",
+  },
+  {
+    icon: <LuGithub size={20} />,
+    href: "34",
+  },
+];
+
+export interface FooterListingItems {
+  label: string;
+  data: { item: string[] };
+}
+
+export const FooterListingItems: FooterListingItems[] = [
+  {
+    label: "Explore",
+    data: {
+      item: [
+        "Blog",
+        "Libraries",
+        "Community",
+        "Use Cases",
+        "Security & Compliance",
+        "OSS NPM package",
+        "Terms of use",
+        "Privacy Policy",
+        "Status page",
+      ],
+    },
+  },
+  {
+    label: "Product",
+    data: {
+      item: [
+        "How to start",
+        "Features",
+        "For Teams",
+        "Pricing",
+        "Roadmap",
+        "Release notes",
+      ],
+    },
+  },
+  {
+    label: "Contact us",
+    data: {
+      item: ["support@nosupport.com"],
+    },
   },
 ];

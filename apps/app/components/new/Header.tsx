@@ -1,16 +1,15 @@
 import React from "react";
 import Logo from "./Logo";
 import { LandingPageHeader } from "@/lib/ui/utils";
-import Button from "./Button";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import HeaderDropDown from "./HeaderDropDown";
 import TwoBtn from "./TwoBtn";
 
 const Header = () => {
   return (
-    <header className="fixed bg-white z-[50] top-0 right-0 left-0 w-full flex justify-between items-center px-9 py-7">
+    <header className="fixed bg-[#F8FFF8] z-[50] top-0 right-0 left-0 w-full flex justify-between items-center px-9 py-7">
       <div className="flex justify-center items-center gap-18">
-        <Logo />
+        <Logo src="/logo.svg" />
         <div className="flex relative justify-center capitalize text-[#030064] items-center gap-6 text-[16px]">
           {LandingPageHeader.map((item) => (
             <div
