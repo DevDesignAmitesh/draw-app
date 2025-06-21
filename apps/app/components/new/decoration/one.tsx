@@ -8,7 +8,7 @@ const One = () => {
       viewBox="0 0 105 44"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="absolute top-40 left-96"
+      className="absolute top-40 lg:left-96 md:left-40 sm:left-20 left-10"
     >
       <rect
         x="0.4"

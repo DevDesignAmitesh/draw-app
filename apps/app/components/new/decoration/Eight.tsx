@@ -8,7 +8,7 @@ const Eight = () => {
       viewBox="0 0 201 177"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="absolute top-40 left-40"
+      className="absolute top-40 left-40 lg:block hidden"
     >
       <path
         d="M19.9439 173.455C21.641 173.683 25.5053 173.985 29.6531 174.214C38.1856 174.268 40.7678 174.506 41.5952 174.4C41.9858 174.343 42.3169 174.279 42.9783 174.257"

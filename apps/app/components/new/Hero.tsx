@@ -16,14 +16,14 @@ const Hero = () => {
       <div
         className={`w-full relative h-screen flex justify-center items-center flex-col`}
       >
-        <p className="text-[58px] tracking-widest text-[#030064]">
+        <p className="lg:text-[58px] text-[40px] text-center tracking-widest text-[#030064]">
           Online <span className="p-2 bg-[#D3FFD2] rounded-md">Whiteboard</span>{" "}
           made simple
         </p>
-        <p className="text-[#030064] mt-3 text-[20px] tracking-wider">
+        <p className="text-[#030064] text-center mt-3 lg:text-[20px] text-[15px] tracking-wider">
           Ideate, Collaborate, Share. Simply with Excalidraw.
         </p>
-        <p className="text-[#030064] tracking-widest py-1 px-3 mt-7 text-[14px] rounded-md bg-[#ffe599] border-2 border-[#705400] hover:bg-white cursor-pointer transition-all duration-200">
+        <p className="text-[#030064] text-center tracking-widest py-1 px-3 mt-7 lg:text-[14px] text-[10px] rounded-md bg-[#ffe599] border-2 border-[#705400] hover:bg-white cursor-pointer transition-all duration-200">
           <RiUser3Line className="inline-block mr-2" size={18} />
           102.2 k users not using
         </p>
@@ -31,7 +31,7 @@ const Hero = () => {
       <One />
       <Two />
       <Three />
-      <Four />
+      <Four  />
       <Five />
       <Six />
       <Seven />

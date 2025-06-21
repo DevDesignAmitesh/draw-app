@@ -13,19 +13,18 @@ import Two from "@/components/new/decoration/two";
 
 const Free = () => {
   return (
-    <div className="relative h-[70vh] w-full bg-white flex flex-col justify-start items-center text-[#030064] px-40 pt-12">
+    <div className="relative min-h-[70vh] w-full bg-white flex flex-col justify-start items-center text-[#030064] lg:px-40 md:px-20 px-10 py-10">
       <FreeSvg />
-      <p className="text-3xl tracking-wider mt-2">
+      <p className="text-3xl text-center tracking-wider lg:mt-2 mt-4">
         Try the forever free editor for yourself
       </p>
-      <p className="text-xl text-center w-[50%] mt-2">
+      <p className="text-xl text-center lg:w-[50%] w-full lg:mt-2 mt-4">
         Don’t take our word for granted. Try the forever free Excalidraw
         open-sourced editor for yourself and get your ideas out there.
       </p>
       <TwoBtn className="mt-6" />
       <One />
       <Two />
-      <Three />
       <Four />
     </div>
   );

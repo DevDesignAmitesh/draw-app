@@ -1,6 +1,6 @@
 import React from "react";
 
-const Four = (className: { className?: string }) => {
+const FourCopy = () => {
   return (
     <svg
       width="109"
@@ -8,7 +8,7 @@ const Four = (className: { className?: string }) => {
       viewBox="0 0 109 47"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={`absolute lg:right-60 md:right-40 sm:right-20 right-10 bottom-40 ${className}`}
+      className={`absolute lg:right-60 md:right-40 sm:right-20 right-6 ld:bottom-40 bottom-6`}
     >
       <rect
         x="20.4"
@@ -33,4 +33,4 @@ const Four = (className: { className?: string }) => {
   );
 };
 
-export default Four;
+export default FourCopy;

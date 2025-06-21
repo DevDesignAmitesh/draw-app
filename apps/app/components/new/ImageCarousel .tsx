@@ -21,7 +21,7 @@ const ImageCarousel = () => {
   }, []);
 
   return (
-    <div className="flex flex-col justify-center items-center gap-5 text-[#030064]">
+    <div className="flex flex-col justify-center lg:mt-0 mt-10 items-center gap-5 text-[#030064]">
       {/* Animated wrapper */}
       <div
         className={`transition-all duration-700 ease-in-out transform ${

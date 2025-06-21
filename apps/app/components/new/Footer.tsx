@@ -13,10 +13,10 @@ const Footer = () => {
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
       }}
-      className="w-full h-[50vh] bg-[#232329] overflow-hidden"
+      className="w-full min-h-[50vh] bg-[#232329] overflow-hidden"
     >
-      <div className="flex items-start pt-20 justify-between h-full text-white text-center px-40">
-        <div className="flex flex-col justify-center items-start gap-10">
+      <div className="flex lg:flex-row flex-col items-start lg:py-20 py-10 lg:justify-between justify-start h-full text-white text-center lg:gap-0 gap-10 lg:px-40 md:px-20 px-10">
+        <div className="flex flex-col justify-center items-start lg:gap-10 gap-5">
           <Logo src="https://plus.excalidraw.com/images/logo-dark.svg" />
           <div className="flex justify-center items-center gap-4">
             {footerPublicLink.map((item) => (
@@ -30,7 +30,7 @@ const Footer = () => {
             ))}
           </div>
         </div>
-        <div className="flex justify-center items-start gap-16">
+        <div className="flex md:justify-center justify-start items-start flex-wrap gap-16">
           {FooterListingItems.map((item) => (
             <FooterListing data={item.data.item} label={item.label} />
           ))}

@@ -7,9 +7,10 @@ interface ButtonProps {
   href: string;
   label: string;
   variant: BtnVariant;
+  className?: string
 }
 
-const Button = ({ href, label, variant }: ButtonProps) => {
+const Button = ({ href, label, variant, className }: ButtonProps) => {
   const baseStyles =
     "px-7 py-[10px] tracking-wider text-[#030064] rounded-full transition-all duration-200";
   const whiteBtnStyles = `border-2 hover:bg-[#F5F5F9] border-[#C5C5D0]`;
@@ -17,7 +18,7 @@ const Button = ({ href, label, variant }: ButtonProps) => {
 
   return (
     <Link
-      className={`${baseStyles} ${variant === "white" ? whiteBtnStyles : blueBtnStyles}`}
+      className={`${baseStyles} ${variant === "white" ? whiteBtnStyles : blueBtnStyles} ${className}`}
       href={href}
     >
       {label}

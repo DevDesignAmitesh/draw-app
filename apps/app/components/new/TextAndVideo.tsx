@@ -26,8 +26,8 @@ const TextAndVideo = ({
 }: TextAndVideo) => {
   return (
     <div
-      className={`w-full bg-white ${isBiglayout ? "min-h-screen" : "h-auto"} flex justify-center items-start px-40 ${
-        label === "no sign-up" ? "py-30" : "py-20"
+      className={`w-full bg-white ${isBiglayout ? "min-h-screen" : "h-auto"} flex justify-center items-start lg:px-40 md:px-20 px-6 ${
+        label === "no sign-up" ? "lg:py-30 md:py-20 py-10" : "lg:py-20 py-10"
       } gap-5`}
     >
       <div className="flex flex-col justify-center items-center">
@@ -38,11 +38,11 @@ const TextAndVideo = ({
       </div>
       {isBiglayout ? (
         <div className="w-full h-screen flex flex-col justify-start items-start text-[#030064] gap-2">
-          <span className="p-2 bg-[#D3FFD2] rounded-md text-[15px]">
+          <span className="p-2 bg-[#D3FFD2] rounded-md lg:text-[15px] text-[13px]">
             {label}
           </span>
-          <p className="text-5xl font-medium">{title}</p>
-          <p className="text-[18px]">{description}</p>
+          <p className="lg:text-5xl text-3xl font-medium">{title}</p>
+          <p className="lg:text-[18px] text-[15px]">{description}</p>
           <video
             src={videoUrl}
             loop
@@ -50,16 +50,16 @@ const TextAndVideo = ({
             autoPlay
             className="w-full h-full object-cover rounded-lg mt-4"
           />
-          <div className="w-full grid grid-cols-3 gap-5 mt-4">
+          <div className="w-full grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-5 mt-4">
             <CardComp type={type} />
             <CardComp type={type} />
           </div>
         </div>
       ) : (
         <div className="w-full h-fit flex flex-col justify-start items-start text-[#030064] gap-2">
-          <p className="text-5xl font-medium">
+          <p className="lg:text-5xl text-3xl font-medium">
             {title} <span className="p-2 bg-[#D3FFD2] rounded-md">{label}</span>
-            <p className="text-[18px] mt-6">{description}</p>
+            <p className="lg:text-[18px] text-[15px] mt-6">{description}</p>
           </p>
           <TwoBtn className="mt-2" />
         </div>

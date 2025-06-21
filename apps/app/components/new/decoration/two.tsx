@@ -8,7 +8,7 @@ const Two = () => {
       viewBox="0 0 107 42"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="absolute right-40 top-60"
+      className="absolute md:right-40 sm:right-20 right-10 md:top-60 top-40"
     >
       <rect
         x="18.4"
