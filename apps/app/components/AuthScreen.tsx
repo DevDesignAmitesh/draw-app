@@ -90,8 +90,8 @@ const AuthScreen = ({ isSignin }: { isSignin?: boolean }) => {
   const alternateAction = isSignin ? "Sign up" : "Sign in";
 
   return (
-    <div className="w-full h-screen bg-[#121212] flex flex-col gap-16 justify-center items-center p-10">
-      <Logo src="https://plus.excalidraw.com/images/logo-dark.svg" />
+    <div className="w-full h-screen dark:bg-[#121212] bg-white flex flex-col gap-16 justify-center items-center p-10">
+      <Logo />
       <div className="flex w-full justify-center gap-60 items-center">
         <ImageCarousel />
         <div className="flex flex-col justify-center items-center">

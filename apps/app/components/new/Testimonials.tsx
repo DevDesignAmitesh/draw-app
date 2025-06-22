@@ -4,7 +4,7 @@ import { FaXTwitter } from "react-icons/fa6";
 
 const Testimonials = () => {
   return (
-    <div className="min-h-[70vh] w-full flex flex-col justify-start items-start text-[#030064] lg:px-40 md:px-20 px-10 py-10">
+    <div className="min-h-[70vh] w-full flex flex-col justify-start items-start text-[#030064] dark:text-white lg:px-40 md:px-20 px-10 py-10">
       <p className="text-6xl font-medium">Loved by individuals</p>
       <p className="mt-16 tracking-wider text-[18px]">
         See what other people say about Excalidraw.
@@ -13,7 +13,7 @@ const Testimonials = () => {
         {Array.from({ length: 3 }).map((_, index) => (
           <div
             key={index}
-            className="flex flex-col justify-start items-start tracking-wider bg-white p-5 shadow-md border border-neutral-400 rounded-md hover:shadow-xl cursor-pointer"
+            className="flex flex-col justify-start items-start tracking-wider bg-white p-5 shadow-md border border-neutral-400 rounded-md hover:shadow-xl cursor-pointer text-black"
           >
             <div className="w-full flex justify-between items-center">
               <div className="flex justify-center items-center gap-2">

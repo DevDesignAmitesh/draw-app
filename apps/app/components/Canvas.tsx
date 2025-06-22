@@ -28,10 +28,6 @@ const Canvas = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [textBoxes, setTextBoxes] = useState<
-    { id: string; x: number; y: number; text: string }[]
-  >([]);
-
   const handleDrop = (e: React.DragEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     const rect = e.currentTarget.getBoundingClientRect();
@@ -79,10 +75,11 @@ const Canvas = ({
         setDetails,
         setSideBar,
         userId,
-        setActiveInput,
-        textBoxes
+        setActiveInput
       );
       setDraw(draw);
+
+      draw.changeTheme(theme);
 
       return () => {
         draw.destroyCanvasHandler();
@@ -99,20 +96,15 @@ const Canvas = ({
   useEffect(() => {
     if (draw) {
       draw.changeTheme(theme);
+      draw.changeStyles(details);
     }
-  }, [theme, details]);
+  }, [theme]);
 
   useEffect(() => {
     if (draw) {
       draw.changeStyles(details);
     }
-  }, [details, theme]);
-
-  useEffect(() => {
-    if (draw) {
-      draw.updateTextBoxes(textBoxes);
-    }
-  }, [textBoxes, activeInput]);
+  }, [details]);
 
   return (
     <div className="w-full h-screen overflow-hidden relative">

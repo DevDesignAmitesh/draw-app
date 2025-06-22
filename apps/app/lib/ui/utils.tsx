@@ -12,7 +12,7 @@ export const LandingPageHeader: LandingPageHeader[] = [
     label: "pricing",
   },
   {
-    label: "teams",
+    label: "toggle theme",
   },
   {
     label: "roadmaps",

@@ -41,12 +41,6 @@ export class Draw {
       text: string;
     } | null>
   >;
-  public textBoxes: {
-    id: string;
-    x: number;
-    y: number;
-    text: string;
-  }[];
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -63,16 +57,9 @@ export class Draw {
         y: number;
         text: string;
       } | null>
-    >,
-    textBoxes: {
-      id: string;
-      x: number;
-      y: number;
-      text: string;
-    }[]
+    >
   ) {
     this.userId = userId;
-    this.textBoxes = textBoxes;
     this.details = details;
     this.setDetails = setDetails;
     this.setSideBar = setSideBar;
@@ -97,17 +84,19 @@ export class Draw {
     this.startY = 0;
     this.currentX = 0;
     this.currentY = 0;
-    this.renderAllShapes(this.textBoxes);
     this.loadAllShapes(roomSlug);
     this.webSockerInitHandler();
     this.startHandler();
     this.startCanvasHandler();
+
+    console.log(theme);
   }
 
   public loadAllShapes = async (slug: string) => {
     try {
       this.existingShapes = await getAllShapes(slug);
-      this.renderAllShapes(this.textBoxes);
+      this.renderAllShapes();
+      console.log(this.existingShapes);
     } catch (error) {
       console.log(error);
     }
@@ -135,7 +124,7 @@ export class Draw {
             shape.id === updatedShape.id ? updatedShape : shape
           );
         }
-        this.renderAllShapes(this.textBoxes);
+        this.renderAllShapes();
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
       }
@@ -157,8 +146,12 @@ export class Draw {
   };
 
   public changeTheme(theme: string) {
+    console.log(theme, "in the change theme fn");
     const themeColor = theme === "dark" ? "#fff" : "#000";
     const themeBgColor = theme === "dark" ? "#121212" : "#fff";
+
+    console.log(themeBgColor, themeColor);
+    console.log("themeBgColor", "themeColor");
 
     if (this.strokeColor === "#000" || this.strokeColor === "#fff") {
       this.strokeColor = themeColor;
@@ -191,7 +184,7 @@ export class Draw {
       }
     });
 
-    this.renderAllShapes(this.textBoxes);
+    this.renderAllShapes();
   }
 
   public changeStyles(data: FormDataTypes) {
@@ -244,17 +237,10 @@ export class Draw {
     this.fillColor = data.bgColor ?? this.fillColor;
     this.textColor = data.textColor ?? this.textColor;
 
-    this.renderAllShapes(this.textBoxes);
+    this.renderAllShapes();
   }
 
-  public renderAllShapes = (
-    textBoxes: {
-      id: string;
-      x: number;
-      y: number;
-      text: string;
-    }[]
-  ) => {
+  public renderAllShapes = () => {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.existingShapes.map((item) => {
       this.context.globalAlpha = item.opacity;
@@ -288,7 +274,7 @@ export class Draw {
           image.src = item.imgSrc;
           image.onload = () => {
             item.img = image;
-            this.renderAllShapes(this.textBoxes); // re-render when image is loaded
+            this.renderAllShapes(); // re-render when image is loaded
           };
           return; // Skip rendering for now
         }
@@ -323,22 +309,10 @@ export class Draw {
     });
   };
 
-  public updateTextBoxes = (
-    textBoxes: {
-      id: string;
-      x: number;
-      y: number;
-      text: string;
-    }[]
-  ) => {
-    this.textBoxes = textBoxes;
-    this.renderAllShapes(textBoxes);
-  };
-
   public addingTextInExistingShapes = (input: Shapes) => {
     this.existingShapes.push(input);
     this.sendMessageViaWebSocket(input);
-    this.renderAllShapes(this.textBoxes);
+    this.renderAllShapes();
   };
 
   public addingImageInExistingShapes = (
@@ -361,7 +335,7 @@ export class Draw {
 
     this.existingShapes.push(data);
     this.sendMessageViaWebSocket({ ...data, img: undefined });
-    this.renderAllShapes(this.textBoxes);
+    this.renderAllShapes();
   };
 
   public changeSelectedTool = (tool: selectedTools) => {
@@ -517,7 +491,7 @@ export class Draw {
         this.currentY = e.clientY - rect.top;
       }
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.renderAllShapes(this.textBoxes);
+      this.renderAllShapes();
 
       const currentOpacity = this.details.opacity || this.opacity;
       this.context.globalAlpha = currentOpacity;
@@ -746,7 +720,7 @@ export class Draw {
       }
 
       this.setSideBar(shouldShowSidebar);
-      this.renderAllShapes(this.textBoxes);
+      this.renderAllShapes();
     }
 
     if (this.selectedTools === "text") {
@@ -833,14 +807,14 @@ export class Draw {
       this.originalStroke.clear();
     }
 
-    this.renderAllShapes(this.textBoxes);
+    this.renderAllShapes();
   };
 
   public redoLastShape = () => {
     if (this.undoShapes.length === 0) return;
     const last = this.undoShapes.pop()!;
     this.existingShapes.push(last);
-    this.renderAllShapes(this.textBoxes);
+    this.renderAllShapes();
   };
 
   public downloadImage = () => {

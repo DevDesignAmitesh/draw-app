@@ -26,7 +26,7 @@ const TextAndVideo = ({
 }: TextAndVideo) => {
   return (
     <div
-      className={`w-full bg-white ${isBiglayout ? "min-h-screen" : "h-auto"} flex justify-center items-start lg:px-40 md:px-20 px-6 ${
+      className={`w-full bg-white dark:bg-[#121212] ${isBiglayout ? "min-h-screen" : "h-auto"} flex justify-center items-start lg:px-40 md:px-20 px-6 ${
         label === "no sign-up" ? "lg:py-30 md:py-20 py-10" : "lg:py-20 py-10"
       } gap-5`}
     >
@@ -37,12 +37,14 @@ const TextAndVideo = ({
         />
       </div>
       {isBiglayout ? (
-        <div className="w-full h-screen flex flex-col justify-start items-start text-[#030064] gap-2">
-          <span className="p-2 bg-[#D3FFD2] rounded-md lg:text-[15px] text-[13px]">
+        <div className="w-full h-screen flex flex-col justify-start items-start text-[#030064] dark:text-white gap-2">
+          <span className="p-2 bg-[#D3FFD2] dark:bg-[#030064] rounded-md lg:text-[15px] text-[13px]">
             {label}
           </span>
           <p className="lg:text-5xl text-3xl font-medium">{title}</p>
-          <p className="lg:text-[18px] text-[15px]">{description}</p>
+          <p className="lg:text-[18px] text-[15px] dark:text-neutral-400">
+            {description}
+          </p>
           <video
             src={videoUrl}
             loop
@@ -56,9 +58,12 @@ const TextAndVideo = ({
           </div>
         </div>
       ) : (
-        <div className="w-full h-fit flex flex-col justify-start items-start text-[#030064] gap-2">
+        <div className="w-full h-fit flex flex-col justify-start items-start text-[#030064] dark:text-white gap-2">
           <div className="lg:text-5xl text-3xl font-medium">
-            {title} <span className="p-2 bg-[#D3FFD2] rounded-md">{label}</span>
+            {title}{" "}
+            <span className="p-2 bg-[#D3FFD2] dark:bg-[#030064] rounded-md">
+              {label}
+            </span>
             <p className="lg:text-[18px] text-[15px] mt-6">{description}</p>
           </div>
           <TwoBtn className="mt-2" />

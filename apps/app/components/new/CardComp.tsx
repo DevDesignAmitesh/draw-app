@@ -7,18 +7,18 @@ const CardComp = ({ type }: { type: CardType }) => {
   if (type === "normal") {
     return (
       <div className="flex flex-col justify-start items-start tracking-wider bg-white p-5 shadow-md border border-neutral-400 rounded-md">
-        <p>✏️ Easy to use</p>
+        <p className="text-black">✏️ Easy to use</p>
         <p className="text-neutral-600">Zero learning curve</p>
       </div>
     );
   } else if (type === "long-text") {
     return (
       <div className="flex flex-col justify-start items-start tracking-wider bg-white p-5 shadow-md border border-neutral-400 rounded-md hover:bg-[#F5F5FC] transition-all duration-200 cursor-pointer">
-        <p>UML diagram</p>
+        <p className="text-black">UML diagram</p>
         <p className="text-neutral-600 mt-3">
           Visualize and communicate different aspects od a system effectively
         </p>
-        <p className="underline">Read it</p>
+        <p className="underline text-black">Read it</p>
       </div>
     );
   } else if (type === "twitter") {
@@ -35,14 +35,14 @@ const CardComp = ({ type }: { type: CardType }) => {
               }
               className="rounded-full"
             />
-            <div className="flex justify-start items-start flex-col">
+            <div className="flex justify-start items-start flex-col text-black">
               <p>Adam Rackis</p>
               <p className="text-[13px]">@AdamRackis</p>
             </div>
           </div>
           <FaXTwitter size={18} />
         </div>
-        <p className="text-[14px] tracking-wide text-left mt-4">
+        <p className="text-[14px] tracking-wide text-left mt-4 text-black">
           LOVE Excalidraw. Diagramming made simple. With an AI integration
           that’s actually useful!
         </p>

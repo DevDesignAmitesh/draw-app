@@ -13,7 +13,7 @@ const ImageWithPartner = () => {
         className="z-[50] object-cover object-center shadow-md"
       />
       <div className="w-full flex flex-col justify-center items-center gap-5 lg:pb-20 pb-8 lg:pt-30 pt-16">
-        <p className="text-[#030064] text-center lg:text-[22px] text-[19px] tracking-wider">
+        <p className="text-[#030064] dark:text-white text-center lg:text-[22px] text-[19px] tracking-wider">
           Trusted by the largest companies in the world
         </p>
         <div className="w-full flex flex-wrap justify-center items-center gap-4 sm:gap-6 md:gap-8 lg:px-4 px-2 pt-4">
