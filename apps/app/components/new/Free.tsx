@@ -13,7 +13,7 @@ import Two from "@/components/new/decoration/two";
 
 const Free = () => {
   return (
-    <div className="relative min-h-[70vh] w-full bg-white dark:bg-[#121212] flex flex-col justify-start items-center text-[#030064] dark:text-white lg:px-40 md:px-20 px-10 py-10">
+    <div className="relative min-h-[70vh] w-full bg-white dark:bg-[#121211] flex flex-col justify-start items-center text-[#030064] dark:text-white lg:px-40 md:px-20 px-10 py-10">
       <FreeSvg />
       <p className="text-3xl text-center tracking-wider lg:mt-2 mt-4">
         Try the forever free editor for yourself

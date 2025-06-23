@@ -95,10 +95,35 @@ export class Draw {
   public loadAllShapes = async (slug: string) => {
     try {
       this.existingShapes = await getAllShapes(slug);
+      this.existingShapes = this.existingShapes.map((shape) => {
+        const updatedShape = {
+          ...shape,
+          strokeColor:
+            shape.strokeColor === "#000" || shape.strokeColor === "#fff"
+              ? this.strokeColor!
+              : shape.strokeColor!,
+          fillColor:
+            shape.fillColor === "#121212" || shape.fillColor === "#fff"
+              ? this.bgColor!
+              : shape.fillColor!,
+        };
+
+        // Only update textColor for text shapes
+        if (shape.type === "text") {
+          return {
+            ...updatedShape,
+            textColor:
+              shape.textColor === "#000" || shape.textColor === "#fff"
+                ? this.textColor!
+                : shape.textColor,
+          };
+        }
+
+        return updatedShape;
+      });
       this.renderAllShapes();
-      console.log(this.existingShapes);
     } catch (error) {
-      console.log(error);
+      console.error("Error loading shapes:", error);
     }
   };
 
@@ -371,6 +396,8 @@ export class Draw {
     this.canvas.removeEventListener("mouseup", this.mouseUpHandler);
     this.canvas.removeEventListener("mousemove", this.mouseMoveHandler);
     this.canvas.removeEventListener("click", this.mouseClickHandler);
+    this.ws.onmessage = null;
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   };
 
   private mouseDownHandler = (e: MouseEvent | TouchEvent) => {

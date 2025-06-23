@@ -80,12 +80,12 @@ const Canvas = ({
       setDraw(draw);
 
       draw.changeTheme(theme);
-
+      draw.loadAllShapes(roomSlug);
       return () => {
         draw.destroyCanvasHandler();
       };
     }
-  }, []);
+  }, [theme, socket, roomSlug, userId]);
 
   useEffect(() => {
     if (draw) {
@@ -95,16 +95,33 @@ const Canvas = ({
 
   useEffect(() => {
     if (draw) {
-      draw.changeTheme(theme);
       draw.changeStyles(details);
     }
-  }, [theme]);
+  }, [details, theme, selectedTools]);
 
   useEffect(() => {
-    if (draw) {
-      draw.changeStyles(details);
-    }
-  }, [details]);
+    setDetails((prev) => ({
+      ...prev,
+      strokeColor:
+        prev.strokeColor === "#fff" || prev.strokeColor === "#000"
+          ? theme === "dark"
+            ? "#fff"
+            : "#000"
+          : prev.strokeColor,
+      textColor:
+        prev.textColor === "#fff" || prev.textColor === "#000"
+          ? theme === "dark"
+            ? "#fff"
+            : "#000"
+          : prev.textColor,
+      bgColor:
+        prev.bgColor === "#121212" || prev.bgColor === "#fff"
+          ? theme === "dark"
+            ? "#121212"
+            : "#fff"
+          : prev.bgColor,
+    }));
+  }, [theme, selectedTools]);
 
   return (
     <div className="w-full h-screen overflow-hidden relative">
