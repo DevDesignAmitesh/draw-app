@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Canvas from "./Canvas";
-import { Shapes, WS_URL } from "@/lib/utils";
+import { WS_URL } from "@/lib/utils";
 
 const MainCanvas = ({
   roomSlug,

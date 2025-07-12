@@ -79,13 +79,12 @@ const Canvas = ({
       );
       setDraw(draw);
 
-      draw.changeTheme(theme);
       draw.loadAllShapes(roomSlug);
       return () => {
         draw.destroyCanvasHandler();
       };
     }
-  }, [theme, socket, roomSlug, userId]);
+  }, []);
 
   useEffect(() => {
     if (draw) {
@@ -97,7 +96,7 @@ const Canvas = ({
     if (draw) {
       draw.changeStyles(details);
     }
-  }, [details, theme, selectedTools]);
+  }, [details]);
 
   useEffect(() => {
     setDetails((prev) => ({
@@ -121,7 +120,10 @@ const Canvas = ({
             : "#fff"
           : prev.bgColor,
     }));
-  }, [theme, selectedTools]);
+    if (draw) {
+      draw.changeTheme(theme);
+    }
+  }, [theme]);
 
   return (
     <div className="w-full h-screen overflow-hidden relative">

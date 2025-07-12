@@ -42,7 +42,10 @@ const Header = ({ userId }: { userId: string | null }) => {
         </div>
       </div>
       {userId ? (
-        <Button href="/dashboard" variant="blue" label="Dashboard" />
+        <div className="flex justify-center items-center gap-6">
+          <Button href="/dashboard" variant="white" label="Dashboard" />
+          <Button href="/create" variant="blue" label="Create Room" />
+        </div>
       ) : (
         <>
           <TwoBtn className="lg:flex hidden" />

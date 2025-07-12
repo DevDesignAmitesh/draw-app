@@ -88,8 +88,6 @@ export class Draw {
     this.webSockerInitHandler();
     this.startHandler();
     this.startCanvasHandler();
-
-    console.log(theme);
   }
 
   public loadAllShapes = async (slug: string) => {
@@ -171,12 +169,8 @@ export class Draw {
   };
 
   public changeTheme(theme: string) {
-    console.log(theme, "in the change theme fn");
     const themeColor = theme === "dark" ? "#fff" : "#000";
     const themeBgColor = theme === "dark" ? "#121212" : "#fff";
-
-    console.log(themeBgColor, themeColor);
-    console.log("themeBgColor", "themeColor");
 
     if (this.strokeColor === "#000" || this.strokeColor === "#fff") {
       this.strokeColor = themeColor;
@@ -255,12 +249,12 @@ export class Draw {
       }
     }
 
-    this.strokeColor = data.strokeColor ?? this.strokeColor;
-    this.strokeWidth = data.strokeWidth ?? this.strokeWidth;
-    this.strokeStyle = data.strokeStyle ?? this.strokeStyle;
-    this.opacity = data.opacity ?? this.opacity;
-    this.fillColor = data.bgColor ?? this.fillColor;
-    this.textColor = data.textColor ?? this.textColor;
+    this.strokeColor = data.strokeColor!;
+    this.strokeWidth = data.strokeWidth!;
+    this.strokeStyle = data.strokeStyle!;
+    this.opacity = data.opacity!;
+    this.fillColor = data.bgColor!;
+    this.textColor = data.textColor!;
 
     this.renderAllShapes();
   }
@@ -321,7 +315,7 @@ export class Draw {
       }
 
       if (item.fillColor) {
-        this.context.fillStyle = item.fillColor!;
+        this.context.fillStyle = item.fillColor;
         this.context.fill();
       }
 
@@ -367,11 +361,6 @@ export class Draw {
     this.selectedTools = tool;
     this.selectedId = null;
     this.setSideBar(false);
-    if (this.details.strokeColor) this.strokeColor = this.details.strokeColor;
-    if (this.details.strokeWidth) this.strokeWidth = this.details.strokeWidth;
-    if (this.details.strokeStyle) this.strokeStyle = this.details.strokeStyle;
-    if (this.details.opacity) this.opacity = this.details.opacity;
-    if (this.details.bgColor) this.fillColor = this.details.bgColor;
   };
 
   private startHandler = () => {
@@ -517,18 +506,21 @@ export class Draw {
         this.currentX = e.clientX - rect.left;
         this.currentY = e.clientY - rect.top;
       }
-      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.renderAllShapes();
 
-      const currentOpacity = this.details.opacity || this.opacity;
+      const currentOpacity = this.opacity;
       this.context.globalAlpha = currentOpacity;
 
       this.context.beginPath();
 
-      const currentStrokeStyle = this.details.strokeStyle || this.strokeStyle;
-      const currentStrokeColor = this.details.strokeColor || this.strokeColor!;
-      const currentStrokeWidth = this.details.strokeWidth || this.strokeWidth;
-      const currentBg = this.details.bgColor || this.fillColor;
+      const currentStrokeStyle = this.strokeStyle;
+      const currentStrokeColor = this.strokeColor;
+      const currentStrokeWidth = this.strokeWidth;
+      const currentBg = this.bgColor;
+
+      console.log(currentBg, "currentBg");
+      console.log(currentStrokeColor, "currentStrokeColor");
+      console.log(currentStrokeWidth, "currentStrokeWidth");
 
       if (currentStrokeStyle === "solid") {
         this.context.setLineDash([]);
@@ -582,12 +574,14 @@ export class Draw {
       }
 
       if (currentBg) {
-        this.context.fillStyle = currentBg!;
+        this.context.fillStyle = currentBg;
         this.context.fill();
       }
 
-      this.context.strokeStyle = currentStrokeColor;
-      this.context.stroke();
+      if (currentStrokeColor) {
+        this.context.strokeStyle = currentStrokeColor;
+        this.context.stroke();
+      }
 
       this.context.closePath();
 
