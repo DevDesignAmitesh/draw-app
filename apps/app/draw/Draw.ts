@@ -147,6 +147,32 @@ export class Draw {
             shape.id === updatedShape.id ? updatedShape : shape
           );
         }
+        this.existingShapes = this.existingShapes.map((shape) => {
+          const updatedShape = {
+            ...shape,
+            strokeColor:
+              shape.strokeColor === "#000" || shape.strokeColor === "#fff"
+                ? this.strokeColor!
+                : shape.strokeColor!,
+            fillColor:
+              shape.fillColor === "#121212" || shape.fillColor === "#fff"
+                ? this.bgColor!
+                : shape.fillColor!,
+          };
+
+          // Only update textColor for text shapes
+          if (shape.type === "text") {
+            return {
+              ...updatedShape,
+              textColor:
+                shape.textColor === "#000" || shape.textColor === "#fff"
+                  ? this.textColor!
+                  : shape.textColor,
+            };
+          }
+
+          return updatedShape;
+        });
         this.renderAllShapes();
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
@@ -207,6 +233,7 @@ export class Draw {
   }
 
   public changeStyles(data: FormDataTypes) {
+    console.log(data);
     if (this.selectedId !== null) {
       let selectedShape = this.existingShapes[this.selectedId];
 
@@ -248,13 +275,7 @@ export class Draw {
         selectedShape.textColor = "red";
       }
     }
-
-    this.strokeColor = data.strokeColor!;
-    this.strokeWidth = data.strokeWidth!;
-    this.strokeStyle = data.strokeStyle!;
-    this.opacity = data.opacity!;
-    this.fillColor = data.bgColor!;
-    this.textColor = data.textColor!;
+    this.details = data;
 
     this.renderAllShapes();
   }
@@ -429,6 +450,8 @@ export class Draw {
       };
       this.sendMessageViaWebSocket(shape);
       this.existingShapes.push(shape);
+      console.log("detaisl is running");
+      console.log(this.details);
     }
 
     if (this.selectedTools === "circle") {
@@ -494,6 +517,7 @@ export class Draw {
       this.sendMessageViaWebSocket(shape);
       this.existingShapes.push(shape);
     }
+    this.renderAllShapes();
   };
 
   private mouseMoveHandler = (e: MouseEvent | TouchEvent) => {
@@ -517,10 +541,6 @@ export class Draw {
       const currentStrokeColor = this.strokeColor;
       const currentStrokeWidth = this.strokeWidth;
       const currentBg = this.bgColor;
-
-      console.log(currentBg, "currentBg");
-      console.log(currentStrokeColor, "currentStrokeColor");
-      console.log(currentStrokeWidth, "currentStrokeWidth");
 
       if (currentStrokeStyle === "solid") {
         this.context.setLineDash([]);

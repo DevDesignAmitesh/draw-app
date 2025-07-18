@@ -99,28 +99,32 @@ const Canvas = ({
   }, [details]);
 
   useEffect(() => {
-    setDetails((prev) => ({
-      ...prev,
+    const updatedDetails = {
+      ...details,
       strokeColor:
-        prev.strokeColor === "#fff" || prev.strokeColor === "#000"
+        details.strokeColor === "#fff" || details.strokeColor === "#000"
           ? theme === "dark"
             ? "#fff"
             : "#000"
-          : prev.strokeColor,
+          : details.strokeColor,
       textColor:
-        prev.textColor === "#fff" || prev.textColor === "#000"
+        details.textColor === "#fff" || details.textColor === "#000"
           ? theme === "dark"
             ? "#fff"
             : "#000"
-          : prev.textColor,
+          : details.textColor,
       bgColor:
-        prev.bgColor === "#121212" || prev.bgColor === "#fff"
+        details.bgColor === "#121212" || details.bgColor === "#fff"
           ? theme === "dark"
             ? "#121212"
             : "#fff"
-          : prev.bgColor,
-    }));
+          : details.bgColor,
+    };
+
+    setDetails(updatedDetails);
+
     if (draw) {
+      draw.changeStyles(updatedDetails);
       draw.changeTheme(theme);
     }
   }, [theme]);
