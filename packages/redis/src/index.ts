@@ -1,8 +1,14 @@
+import { config } from "dotenv";
+config();
 import { RedisClientType, createClient } from "redis";
 import { WebSocket } from "ws";
 import { usersProps } from "@repo/types/types";
 
 const subscribedRooms = new Set<string>();
+
+const redisCredentials = {
+  url: process.env.REDIS_URL!,
+};
 
 export class Redis {
   private static commandClient: RedisClientType | null = null;
@@ -11,7 +17,7 @@ export class Redis {
 
   public static async getCommandClient(): Promise<RedisClientType> {
     if (!Redis.commandClient) {
-      Redis.commandClient = createClient();
+      Redis.commandClient = createClient(redisCredentials);
 
       Redis.commandClient.on("error", (err) => {
         console.error("Redis Error:", err);
@@ -25,7 +31,7 @@ export class Redis {
 
   public static async getSubscriberClient(): Promise<RedisClientType> {
     if (!Redis.subscriberClient) {
-      Redis.subscriberClient = createClient();
+      Redis.subscriberClient = createClient(redisCredentials);
 
       Redis.subscriberClient.on("error", (err) => {
         console.error("Redis Error:", err);
