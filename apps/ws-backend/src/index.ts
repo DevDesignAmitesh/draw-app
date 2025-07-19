@@ -15,7 +15,6 @@ const users: usersProps[] = [];
 //     }
 //     return decoded;
 //   } catch (error) {
-//     console.log(error);
 //     return null;
 //   }
 // }
@@ -38,6 +37,7 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
 
   ws.on("message", async (e) => {
     const parsedMessage = JSON.parse(e.toString());
+    console.log(parsedMessage);
     if (parsedMessage.type === "join_room") {
       const { roomSlug, userId } = parsedMessage.payload;
       users.push({
@@ -46,6 +46,17 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
         roomSlug,
       });
       await Redis.subscribeAndSend(ws, roomSlug, users);
+    }
+
+    if (parsedMessage.type === "send_cursor") {
+      const { roomSlug, userId, x, y } = parsedMessage.payload;
+      await Redis.publishJoinMessage(
+        roomSlug,
+        userId,
+        parsedMessage.type,
+        x,
+        y
+      );
     }
 
     if (parsedMessage.type === "leave_room") {
@@ -69,10 +80,6 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
 
     if (parsedMessage.type === "shapes") {
       const { roomSlug, message, userId } = parsedMessage.payload;
-      console.log(
-        "in the ws backend and in the type shapes",
-        parsedMessage.payload
-      );
       await Redis.putShapesInQueue(
         roomSlug,
         message,

@@ -6,6 +6,7 @@ import {
 } from "@/lib/utils";
 import { getAllShapes } from "./client-http";
 import { v4 as uuidv4 } from "uuid";
+import { OthersMap } from "@/components/MainCanvas";
 
 export class Draw {
   private ws: WebSocket;
@@ -29,6 +30,8 @@ export class Draw {
   private originalStroke: Map<number, string> = new Map();
   private setDetails: React.Dispatch<React.SetStateAction<FormDataTypes>>;
   private setSideBar: React.Dispatch<React.SetStateAction<boolean>>;
+  private setOthers: React.Dispatch<React.SetStateAction<OthersMap>>;
+
   private opacity: number;
   private fillColor: string | null;
   private textColor: string | null;
@@ -43,6 +46,7 @@ export class Draw {
   >;
 
   constructor(
+    setOthers: React.Dispatch<React.SetStateAction<OthersMap>>,
     canvas: HTMLCanvasElement,
     ws: WebSocket,
     roomSlug: string,
@@ -63,6 +67,7 @@ export class Draw {
     this.details = details;
     this.setDetails = setDetails;
     this.setSideBar = setSideBar;
+    this.setOthers = setOthers;
     this.setActiveInput = setActiveInput;
     this.strokeColor = theme === "dark" ? "#fff" : "#000";
     this.textColor = theme === "dark" ? "#fff" : "#000";
@@ -130,6 +135,16 @@ export class Draw {
       try {
         const data = JSON.parse(event.data);
 
+        if (data.type === "send_cursor") {
+          console.log("Incoming message:", data);
+          this.setOthers((prev) => ({
+            ...prev,
+            [data.userId]: {
+              x: data.x,
+              y: data.y,
+            },
+          }));
+        }
         if (data.type === "shapes") {
           const shapes = JSON.parse(data.message);
           this.existingShapes.push(shapes);

@@ -17,7 +17,8 @@ export class Redis {
 
   public static async getCommandClient(): Promise<RedisClientType> {
     if (!Redis.commandClient) {
-      Redis.commandClient = createClient(redisCredentials);
+      // Redis.commandClient = createClient(redisCredentials);
+      Redis.commandClient = createClient();
 
       Redis.commandClient.on("error", (err) => {
         console.error("Redis Error:", err);
@@ -31,7 +32,8 @@ export class Redis {
 
   public static async getSubscriberClient(): Promise<RedisClientType> {
     if (!Redis.subscriberClient) {
-      Redis.subscriberClient = createClient(redisCredentials);
+      // Redis.subscriberClient = createClient(redisCredentials);
+      Redis.subscriberClient = createClient();
 
       Redis.subscriberClient.on("error", (err) => {
         console.error("Redis Error:", err);
@@ -54,42 +56,54 @@ export class Redis {
         subscribedRooms.add(roomSlug);
         await client.subscribe(`shapes:${roomSlug}`, (data: any) => {
           const parsedMessage: any = JSON.parse(data);
-          console.log("in the subscribe and send");
-          console.log(parsedMessage);
-          users
-            .filter(
-              (u) =>
-                u.userId !== parsedMessage.userId && u.roomSlug === roomSlug
-            )
-            .forEach((u) => {
-              if (parsedMessage.type === "shapes") {
-                u.ws.send(
-                  JSON.stringify({
-                    type: "shapes",
-                    message: parsedMessage.message,
-                    userId: u.userId,
-                  })
-                );
-              }
-              if (parsedMessage.type === "delete_shape") {
-                u.ws.send(
-                  JSON.stringify({
-                    type: "delete_shape",
-                    message: parsedMessage.message,
-                    userId: u.userId,
-                  })
-                );
-              }
-              if (parsedMessage.type === "update_shape") {
-                u.ws.send(
-                  JSON.stringify({
-                    type: "update_shape",
-                    message: parsedMessage.message,
-                    userId: u.userId,
-                  })
-                );
-              }
+          if (parsedMessage.type === "send_cursor") {
+            users.forEach((u) => {
+              console.log("sending");
+              u.ws.send(
+                JSON.stringify({
+                  type: "send_cursor",
+                  userId: parsedMessage.userId,
+                  x: parsedMessage.x,
+                  y: parsedMessage.y,
+                })
+              );
             });
+          } else {
+            users
+              .filter(
+                (u) =>
+                  u.userId !== parsedMessage.userId && u.roomSlug === roomSlug
+              )
+              .forEach((u) => {
+                if (parsedMessage.type === "shapes") {
+                  u.ws.send(
+                    JSON.stringify({
+                      type: "shapes",
+                      message: parsedMessage.message,
+                      userId: u.userId,
+                    })
+                  );
+                }
+                if (parsedMessage.type === "delete_shape") {
+                  u.ws.send(
+                    JSON.stringify({
+                      type: "delete_shape",
+                      message: parsedMessage.message,
+                      userId: u.userId,
+                    })
+                  );
+                }
+                if (parsedMessage.type === "update_shape") {
+                  u.ws.send(
+                    JSON.stringify({
+                      type: "update_shape",
+                      message: parsedMessage.message,
+                      userId: u.userId,
+                    })
+                  );
+                }
+              });
+          }
         });
 
         const userIndex = users.findIndex((u) => u.ws === ws);
@@ -123,13 +137,6 @@ export class Redis {
   ) {
     try {
       const redis = await Redis.getCommandClient();
-      console.log(
-        "in the put shapes in queue",
-        roomSlug,
-        message,
-        userId,
-        type
-      );
       await redis.lPush(
         Redis.shapesQueueKey,
         JSON.stringify({ roomSlug, message, userId, type })
@@ -153,8 +160,7 @@ export class Redis {
         const result = await client.brPop(Redis.shapesQueueKey, 0);
         if (result) {
           const data = JSON.parse(result.element);
-          console.log("in pickupShapesAndPutInDb");
-          console.log(data);
+
           await handler(data);
           await client.publish(
             `shapes:${data.roomSlug}`,
@@ -168,6 +174,29 @@ export class Redis {
       }
     } catch (e) {
       console.log("error in pickupShapesAndPutInDb: " + e);
+    }
+  }
+
+  public static async publishJoinMessage(
+    roomSlug: string,
+    userId: string,
+    type: string,
+    x: number,
+    y: number
+  ) {
+    try {
+      const client = await Redis.getCommandClient();
+      await client.publish(
+        `shapes:${roomSlug}`,
+        JSON.stringify({
+          type,
+          userId,
+          x,
+          y,
+        })
+      );
+    } catch (e) {
+      console.log("error in publishJoinMessage: " + e);
     }
   }
 }

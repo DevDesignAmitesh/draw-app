@@ -12,15 +12,18 @@ import SideBar from "./SideBar";
 import { ThemeContext } from "@/lib/ThemeProvider";
 import { v4 as uuidv4 } from "uuid";
 import ToggleBtn from "./ToggleBtn";
+import { OthersMap } from "./MainCanvas";
 
 const Canvas = ({
   roomSlug,
   socket,
   userId,
+  setOthers,
 }: {
   roomSlug: string;
   socket: WebSocket;
   userId: string;
+  setOthers: React.Dispatch<React.SetStateAction<OthersMap>>;
 }) => {
   const [draw, setDraw] = useState<Draw>();
   const [selectedTools, setSelectedTools] = useState<selectedTools>("hand");
@@ -67,6 +70,7 @@ const Canvas = ({
   useEffect(() => {
     if (canvasRef.current) {
       const draw = new Draw(
+        setOthers,
         canvasRef.current,
         socket,
         roomSlug,
