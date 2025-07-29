@@ -15,6 +15,9 @@ import ToggleBtn from "./ToggleBtn";
 import { OthersMap } from "./MainCanvas";
 import Button from "./new/Button";
 import { RxHamburgerMenu } from "react-icons/rx";
+import SharePopup from "./popup/SharePopup";
+
+type popup = "second-sidebar" | "share" | null;
 
 const Canvas = ({
   roomSlug,
@@ -50,6 +53,9 @@ const Canvas = ({
       }
     };
   };
+
+  // share url and second side-bar popup state
+  const [popup, setPopup] = useState<popup>(null);
 
   const [activeInput, setActiveInput] = useState<{
     x: number;
@@ -173,10 +179,8 @@ const Canvas = ({
     detailsRef.current = details;
   }, [theme, details]);
 
-  const copyLiveLink = () => {
-    const shareUrl = `https://${window.location.hostname}/canvas/${roomSlug}`;
-    navigator.clipboard.writeText(shareUrl);
-    alert("Share URL copied to clipboard");
+  const openPopup = (input: popup) => {
+    setPopup(input);
   };
 
   return (
@@ -275,15 +279,22 @@ const Canvas = ({
       {/* this will first open a popup and there we will add the copy fn and then closing it */}
       <button
         className="dark:bg-[#4F4D6F] rounded-md bg-[#5B57D1] dark:text-neutral-50 text-neutral-50 py-2 px-4 absolute top-5 right-4 cursor-pointer font-normal"
-        onClick={copyLiveLink}
+        onClick={() => openPopup("share")}
       >
         Share
       </button>
 
       {/* this will toggle a side bar which will have many options and the theme button also */}
-      <button className="dark:bg-[#232329] rounded-md bg-[#F1F0FF] dark:text-neutral-200 text-neutral-800 p-3 absolute top-6 left-4 cursor-pointer flex justify-center items-center">
+      <button
+        onClick={() => openPopup("second-sidebar")}
+        className="dark:bg-[#232329] rounded-md bg-[#F1F0FF] dark:text-neutral-200 text-neutral-800 p-3 absolute top-6 left-4 cursor-pointer flex justify-center items-center"
+      >
         <RxHamburgerMenu size={14} fontWeight={900} />
       </button>
+
+      {popup === "share" && (
+        <SharePopup roomSlug={roomSlug} onClick={() => setPopup(null)} />
+      )}
     </div>
   );
 };
