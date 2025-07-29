@@ -56,54 +56,50 @@ export class Redis {
         subscribedRooms.add(roomSlug);
         await client.subscribe(`shapes:${roomSlug}`, (data: any) => {
           const parsedMessage: any = JSON.parse(data);
-          if (parsedMessage.type === "send_cursor") {
-            users.forEach((u) => {
-              console.log("sending");
-              u.ws.send(
-                JSON.stringify({
-                  type: "send_cursor",
-                  userId: parsedMessage.userId,
-                  x: parsedMessage.x,
-                  y: parsedMessage.y,
-                })
-              );
+          users
+            .filter(
+              (u) =>
+                u.userId !== parsedMessage.userId && u.roomSlug === roomSlug
+            )
+            .forEach((u) => {
+              if (parsedMessage.type === "shapes") {
+                u.ws.send(
+                  JSON.stringify({
+                    type: "shapes",
+                    message: parsedMessage.message,
+                    userId: u.userId,
+                  })
+                );
+              }
+              if (parsedMessage.type === "delete_shape") {
+                u.ws.send(
+                  JSON.stringify({
+                    type: "delete_shape",
+                    message: parsedMessage.message,
+                    userId: u.userId,
+                  })
+                );
+              }
+              if (parsedMessage.type === "update_shape") {
+                u.ws.send(
+                  JSON.stringify({
+                    type: "update_shape",
+                    message: parsedMessage.message,
+                    userId: u.userId,
+                  })
+                );
+              }
+              if (parsedMessage.type === "send_cursor") {
+                u.ws.send(
+                  JSON.stringify({
+                    type: "send_cursor",
+                    userId: parsedMessage.userId,
+                    x: parsedMessage.x,
+                    y: parsedMessage.y,
+                  })
+                );
+              }
             });
-          } else {
-            users
-              .filter(
-                (u) =>
-                  u.userId !== parsedMessage.userId && u.roomSlug === roomSlug
-              )
-              .forEach((u) => {
-                if (parsedMessage.type === "shapes") {
-                  u.ws.send(
-                    JSON.stringify({
-                      type: "shapes",
-                      message: parsedMessage.message,
-                      userId: u.userId,
-                    })
-                  );
-                }
-                if (parsedMessage.type === "delete_shape") {
-                  u.ws.send(
-                    JSON.stringify({
-                      type: "delete_shape",
-                      message: parsedMessage.message,
-                      userId: u.userId,
-                    })
-                  );
-                }
-                if (parsedMessage.type === "update_shape") {
-                  u.ws.send(
-                    JSON.stringify({
-                      type: "update_shape",
-                      message: parsedMessage.message,
-                      userId: u.userId,
-                    })
-                  );
-                }
-              });
-          }
         });
 
         const userIndex = users.findIndex((u) => u.ws === ws);

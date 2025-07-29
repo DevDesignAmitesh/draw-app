@@ -11,21 +11,23 @@ import Six from "@/components/new/decoration/six";
 import Three from "@/components/new/decoration/three";
 import Two from "@/components/new/decoration/two";
 
-const Free = () => {
+const Free = ({ userId }: { userId: string | null }) => {
   return (
-    <div className="relative min-h-[70vh] w-full bg-white dark:bg-[#121211] flex flex-col justify-start items-center text-[#030064] dark:text-white lg:px-40 md:px-20 px-10 py-10">
-      <FreeSvg />
-      <p className="text-3xl text-center tracking-wider lg:mt-2 mt-4">
-        Try the forever free editor for yourself
-      </p>
-      <p className="text-xl text-center lg:w-[50%] w-full lg:mt-2 mt-4">
-        Don’t take our word for granted. Try the forever free Excalidraw
-        open-sourced editor for yourself and get your ideas out there.
-      </p>
-      <TwoBtn className="mt-6" />
-      <One />
+    <div className="w-full py-20 bg-gray-100 dark:bg-neutral-950">
+      <div className="relative h-auto w-full max-w-7xl mx-auto flex flex-col justify-start items-center text-[#030064] dark:text-white">
+        <FreeSvg />
+        <p className="text-3xl text-center tracking-wider lg:mt-2 mt-4">
+          Try the forever free editor for yourself
+        </p>
+        <p className="text-xl dark:text-neutral-300 text-neutral-700 text-center lg:w-[50%] w-full lg:mt-2 mt-4">
+          Don’t take our word for granted. Try the forever free Excalidraw
+          open-sourced editor for yourself and get your ideas out there.
+        </p>
+        <TwoBtn className="mt-6" userId={userId} />
+        {/* <One />
       <Two />
-      <Four />
+      <Four /> */}
+      </div>
     </div>
   );
 };

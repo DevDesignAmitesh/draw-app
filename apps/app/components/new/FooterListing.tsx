@@ -11,11 +11,11 @@ const FooterListing = ({ label, data }: FooterListing) => {
   return (
     <div className="flex flex-col justify-start items-start text-[#D0CCFF]">
       <>
-        <h1 className="font-semibold text-[18px]">{label}</h1>
+        <h1 className="font-semibold text-[24px]">{label}</h1>
         {data.map((item) => (
           <p
             key={item}
-            className="text-[13px] mb-1 hover:underline cursor-pointer"
+            className="text-[15px] tracking-wider mb-1 hover:underline cursor-pointer"
           >
             {item}
           </p>

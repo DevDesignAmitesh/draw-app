@@ -25,22 +25,25 @@ import TextAndVideoComp from "@/components/new/TextAndVideoComp";
 import Free from "@/components/new/Free";
 import Footer from "@/components/new/Footer";
 import PlusFeature from "@/components/new/PlusFeature";
+import { getUserId } from "@/draw/server-http";
 
-const page = () => {
+const page = async () => {
   const ImageWithPartner = dynamic(
     () => import("@/components/new/ImageWithPartner")
   );
   const SayHi = dynamic(() => import("@/components/new/SayHi"));
 
+  const userId = await getUserId();
+
   return (
     <div className="w-full min-h-screen">
       <Hero />
       <ImageWithPartner />
-      <SayHi />
-      <TextAndVideoComp />
+      <SayHi userId={userId} />
+      <TextAndVideoComp userId={userId} />
       <Testimonials />
-      <Free />
-      <PlusFeature />
+      <Free userId={userId} />
+      <PlusFeature userId={userId} />
       <Footer />
     </div>
   );

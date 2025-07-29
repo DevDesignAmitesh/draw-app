@@ -23,29 +23,31 @@ const Dashboard = async () => {
   };
 
   return (
-    <div className="w-full min-h-[80vh] max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-30 md:px-10 px-4">
-      {cards.map((card) => (
-        <Link
-          href={`/canvas/${card.slug}`}
-          key={card.id}
-          className="relative w-full h-[200px] flex flex-col justify-between items-start rounded-lg border-2 border-neutral-400 dark:border-neutral-600 p-5 bg-white dark:bg-neutral-800 shadow-sm hover:shadow-lg transition-all tracking-wider hover:scale-[1.02] cursor-pointer"
-        >
-          <div className="w-full flex flex-col justify-center items-start">
-            <div className="w-full flex items-center gap-3 mb-3">
-              <FaProjectDiagram className="text-2xl text-blue-500" />
-              <h1 className="text-lg font-medium text-black dark:text-white">
-                {card.name}
-              </h1>
+    <div className="w-full">
+      <div className="w-full min-h-screen pt-32 h-auto max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {cards.map((card) => (
+          <Link
+            href={`/canvas/${card.slug}`}
+            key={card.id}
+            className="relative w-full h-[200px] flex flex-col justify-between items-start rounded-lg border-2 border-neutral-400 dark:border-neutral-600 p-5 bg-white dark:bg-neutral-800 shadow-sm hover:shadow-lg transition-all tracking-wider hover:scale-[1.02] cursor-pointer"
+          >
+            <div className="w-full flex flex-col justify-center items-start">
+              <div className="w-full flex items-center gap-3 mb-3">
+                <FaProjectDiagram className="text-2xl text-blue-500" />
+                <h1 className="text-lg font-medium text-black dark:text-white">
+                  {card.name}
+                </h1>
+              </div>
+              <p className="text-neutral-600 dark:text-neutral-300 text-sm">
+                <span className="text-[18px]">Slug:</span> {card.slug}
+              </p>
             </div>
-            <p className="text-neutral-600 dark:text-neutral-300 text-sm">
-              <span className="text-[18px]">Slug:</span> {card.slug}
+            <p className="absolute right-4 bottom-4 dark:text-white text-black text-[15px]">
+              Created At: {formatDate(card.createdAt)}
             </p>
-          </div>
-          <p className="absolute right-4 bottom-4 dark:text-white text-black text-[15px]">
-            Created At: {formatDate(card.createdAt)}
-          </p>
-        </Link>
-      ))}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 };

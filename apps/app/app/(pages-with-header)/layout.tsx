@@ -13,7 +13,7 @@ export default async function Layout({
     <div className="bg-[#F8FFF8] dark:bg-[#121212]">
       <>
         <Header userId={userId} />
-        {children}
+        <div className="w-full">{children}</div>
       </>
     </div>
   );
