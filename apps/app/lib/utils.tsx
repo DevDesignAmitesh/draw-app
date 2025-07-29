@@ -18,8 +18,7 @@ export type selectedTools =
   | "redo"
   | "download"
   | "text"
-  | "img"
-  ;
+  | "img";
 
 interface TopBarItemProps {
   icon: ReactElement;
@@ -33,7 +32,6 @@ export const topBarItems: TopBarItemProps[] = [
   { icon: <TfiLayoutLineSolid />, label: "line" },
   { icon: <FaRegHandPaper />, label: "hand" },
   { icon: <BsEraser />, label: "eraser" },
-  { icon: <FiDownload />, label: "download" },
   { icon: <CiText />, label: "text" },
 ];
 
@@ -465,7 +463,7 @@ export interface FormDataTypes {
   strokeWidth?: number | null;
   strokeStyle?: string | null;
   opacity?: number | null;
-  type: selectedTools | null
+  type: selectedTools | null;
 }
 
 export const HTTP_URL = "http://localhost:5000/api/v1";

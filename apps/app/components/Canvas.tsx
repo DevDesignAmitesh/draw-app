@@ -16,6 +16,7 @@ import { OthersMap } from "./MainCanvas";
 import Button from "./new/Button";
 import { RxHamburgerMenu } from "react-icons/rx";
 import SharePopup from "./popup/SharePopup";
+import SecondSideba from "./popup/SecondSideba";
 
 type popup = "second-sidebar" | "share" | null;
 
@@ -186,7 +187,7 @@ const Canvas = ({
   return (
     <div className="w-full h-screen overflow-hidden relative">
       {/* top bar */}
-      <div className="px-2 py-1 rounded-md dark:bg-[#232329] dark:text-white text-black bg-white absolute top-4 left-1/2 transform -translate-x-1/2 flex gap-1 border border-neutral-600">
+      <div className="p-1 rounded-md dark:bg-[#232329] dark:text-white text-black bg-white absolute top-4 left-1/2 transform -translate-x-1/2 flex gap-1 border border-neutral-600">
         {topBarItems.map((item) => {
           const isSelected = selectedTools === item.label;
 
@@ -194,7 +195,6 @@ const Canvas = ({
             <button
               onClick={() => {
                 setSelectedTools(item.label);
-                item.label === "download" && draw?.downloadImage();
               }}
               key={item.label}
               className={`p-3 cursor-pointer rounded transition
@@ -209,7 +209,6 @@ const Canvas = ({
             </button>
           );
         })}
-        <ToggleBtn />
       </div>
 
       {/* left bottom bar */}
@@ -294,6 +293,10 @@ const Canvas = ({
 
       {popup === "share" && (
         <SharePopup roomSlug={roomSlug} onClick={() => setPopup(null)} />
+      )}
+
+      {popup === "second-sidebar" && (
+        <SecondSideba onClick={() => setPopup(null)} />
       )}
     </div>
   );
