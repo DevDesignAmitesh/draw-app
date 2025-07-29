@@ -13,6 +13,8 @@ import { ThemeContext } from "@/lib/ThemeProvider";
 import { v4 as uuidv4 } from "uuid";
 import ToggleBtn from "./ToggleBtn";
 import { OthersMap } from "./MainCanvas";
+import Button from "./new/Button";
+import { RxHamburgerMenu } from "react-icons/rx";
 
 const Canvas = ({
   roomSlug,
@@ -171,6 +173,12 @@ const Canvas = ({
     detailsRef.current = details;
   }, [theme, details]);
 
+  const copyLiveLink = () => {
+    const shareUrl = `https://${window.location.hostname}/canvas/${roomSlug}`;
+    navigator.clipboard.writeText(shareUrl);
+    alert("Share URL copied to clipboard");
+  };
+
   return (
     <div className="w-full h-screen overflow-hidden relative">
       {/* top bar */}
@@ -263,6 +271,19 @@ const Canvas = ({
           className="absolute z-50 p-2 outline-none bg-transparent"
         />
       )}
+
+      {/* this will first open a popup and there we will add the copy fn and then closing it */}
+      <button
+        className="dark:bg-[#4F4D6F] rounded-md bg-[#5B57D1] dark:text-neutral-50 text-neutral-50 py-2 px-4 absolute top-5 right-4 cursor-pointer font-normal"
+        onClick={copyLiveLink}
+      >
+        Share
+      </button>
+
+      {/* this will toggle a side bar which will have many options and the theme button also */}
+      <button className="dark:bg-[#232329] rounded-md bg-[#F1F0FF] dark:text-neutral-200 text-neutral-800 p-3 absolute top-6 left-4 cursor-pointer flex justify-center items-center">
+        <RxHamburgerMenu size={14} fontWeight={900} />
+      </button>
     </div>
   );
 };

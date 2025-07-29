@@ -8,9 +8,10 @@ interface ButtonProps {
   label: string;
   variant: BtnVariant;
   className?: string;
+  onClick?: () => void;
 }
 
-const Button = ({ href, label, variant, className }: ButtonProps) => {
+const Button = ({ href, label, variant, className, onClick }: ButtonProps) => {
   const baseStyles =
     "md:px-7 px-4 md:py-[10px] py-[7px] tracking-wider rounded-full transition-all duration-200";
   const whiteBtnStyles = `border-2 hover:bg-[#F5F5F9] hover:dark:bg-neutral-600 hover:dark:text-whute text-[#030064] dark:text-white border-[#C5C5D0]`;
@@ -18,6 +19,7 @@ const Button = ({ href, label, variant, className }: ButtonProps) => {
 
   return (
     <Link
+      onClick={onClick}
       className={`${baseStyles} ${variant === "white" ? whiteBtnStyles : blueBtnStyles} ${className}`}
       href={href}
     >
