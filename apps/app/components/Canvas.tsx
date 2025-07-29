@@ -56,6 +56,41 @@ const Canvas = ({
   } | null>(null);
 
   const { theme } = useContext(ThemeContext);
+  const detailsRef = useRef<FormDataTypes | null>(null);
+
+  const handleBlur = () => {
+    if (activeInput && activeInput.text.trim() !== "") {
+      if (draw && detailsRef.current) {
+        console.log(detailsRef.current);
+        const effectiveDetails = detailsRef.current ?? {
+          strokeColor: theme === "dark" ? "#fff" : "#000",
+          textColor: theme === "dark" ? "#fff" : "#000",
+          bgColor: theme === "dark" ? "#121212" : "#fff",
+          strokeStyle: "solid",
+          opacity: 1,
+        };
+
+        if (typeof effectiveDetails.textColor === "undefined") {
+          return;
+        }
+
+        draw.addingTextInExistingShapes({
+          id: uuidv4(),
+          type: "text",
+          x: activeInput.x,
+          y: activeInput.y,
+          text: activeInput.text,
+          width: 2,
+          strokeColor: effectiveDetails.strokeColor!,
+          fillColor: effectiveDetails.bgColor!,
+          strokeStyle: effectiveDetails.strokeStyle!,
+          opacity: effectiveDetails.opacity!,
+          textColor: effectiveDetails.textColor!,
+        });
+      }
+    }
+    setActiveInput(null);
+  };
 
   const [details, setDetails] = useState<FormDataTypes>({
     strokeColor: theme === "dark" ? "#fff" : "#000",
@@ -126,12 +161,15 @@ const Canvas = ({
     };
 
     setDetails(updatedDetails);
-
     if (draw) {
       draw.changeStyles(updatedDetails);
       draw.changeTheme(theme);
     }
   }, [theme]);
+
+  useEffect(() => {
+    detailsRef.current = details;
+  }, [theme, details]);
 
   return (
     <div className="w-full h-screen overflow-hidden relative">
@@ -193,6 +231,13 @@ const Canvas = ({
       {sideBar && <SideBar details={details} setDetails={setDetails} />}
 
       <canvas
+        className={`
+          ${selectedTools === "hand" && "cursor-grab"}
+          ${selectedTools === "text" && "cursor-text"}
+          ${selectedTools === "text" && "cursor-text"}
+          ${selectedTools === "eraser" && "custom-cursor-rubber"}
+          ${selectedTools !== "hand" && selectedTools !== "text" && selectedTools !== "eraser" && "cursor-crosshair"}
+          `}
         width={window.innerWidth}
         height={window.innerHeight}
         ref={canvasRef}
@@ -213,28 +258,7 @@ const Canvas = ({
           onChange={(e) =>
             setActiveInput({ ...activeInput, text: e.target.value })
           }
-          onBlur={() => {
-            if (activeInput && activeInput.text.trim() !== "") {
-              if (draw) {
-                draw.addingTextInExistingShapes({
-                  id: uuidv4(),
-                  type: "text",
-                  x: activeInput.x,
-                  y: activeInput.y,
-                  text: activeInput.text,
-                  width: 2, // Default width for text
-                  strokeColor: details.strokeColor || "#fff",
-                  fillColor: details.bgColor ?? "",
-                  strokeStyle:
-                    (details.strokeStyle ?? theme === "dark") ? "#fff" : "#000",
-                  opacity: details.opacity || 1,
-                  textColor:
-                    (details.textColor ?? theme === "dark") ? "#fff" : "#000",
-                });
-              }
-            }
-            setActiveInput(null);
-          }}
+          onBlur={handleBlur}
           value={activeInput.text}
           className="absolute z-50 p-2 outline-none bg-transparent"
         />

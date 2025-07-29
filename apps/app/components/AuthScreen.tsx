@@ -42,6 +42,7 @@ const AuthScreen = ({ isSignin }: { isSignin?: boolean }) => {
         localStorage.setItem("token", `Bearer ${res.data.token}`);
         router.push("/dashboard");
       }
+      alert(res.data.message);
     } catch (err) {
       alert("Sign-in failed. Try again.");
     } finally {

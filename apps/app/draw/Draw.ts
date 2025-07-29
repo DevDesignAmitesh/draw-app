@@ -136,7 +136,6 @@ export class Draw {
         const data = JSON.parse(event.data);
 
         if (data.type === "send_cursor") {
-          console.log("Incoming message:", data);
           this.setOthers((prev) => ({
             ...prev,
             [data.userId]: {
@@ -248,7 +247,6 @@ export class Draw {
   }
 
   public changeStyles(data: FormDataTypes) {
-    console.log(data);
     if (this.selectedId !== null) {
       let selectedShape = this.existingShapes[this.selectedId];
 
@@ -365,6 +363,7 @@ export class Draw {
   };
 
   public addingTextInExistingShapes = (input: Shapes) => {
+    console.log(input);
     this.existingShapes.push(input);
     this.sendMessageViaWebSocket(input);
     this.renderAllShapes();
@@ -465,8 +464,6 @@ export class Draw {
       };
       this.sendMessageViaWebSocket(shape);
       this.existingShapes.push(shape);
-      console.log("detaisl is running");
-      console.log(this.details);
     }
 
     if (this.selectedTools === "circle") {
@@ -532,6 +529,7 @@ export class Draw {
       this.sendMessageViaWebSocket(shape);
       this.existingShapes.push(shape);
     }
+
     this.renderAllShapes();
   };
 

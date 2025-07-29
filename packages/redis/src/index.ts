@@ -186,6 +186,7 @@ export class Redis {
         `shapes:${roomSlug}`,
         JSON.stringify({
           type,
+          roomSlug,
           userId,
           x,
           y,
