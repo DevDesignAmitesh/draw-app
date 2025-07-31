@@ -22,70 +22,13 @@ interface SecondSidebarItems {
   shortCut?: string;
 }
 
-const SecondSidebarItems: SecondSidebarItems[] = [
-  {
-    onClick: () => {},
-    icon: <GoFileDirectory />,
-    text: "Open",
-  },
-  {
-    onClick: () => {},
-    icon: <MdOutlineFileDownload />,
-    text: "Save",
-    shortCut: "Ctrl + Shift + E",
-  },
-  {
-    onClick: () => {},
-    icon: <FiUsers />,
-    text: "Collaboration",
-  },
-  {
-    onClick: () => {},
-    icon: <AiOutlineThunderbolt />,
-    text: "Comand Palette",
-    shortCut: "Ctrl + /",
-  },
-  {
-    onClick: () => {},
-    icon: <IoMdSearch />,
-    text: "Comand Palette",
-    shortCut: "Ctrl + F",
-  },
-  {
-    onClick: () => {},
-    icon: <MdOutlineHelpOutline />,
-    text: "Comand Palette",
-    shortCut: "?",
-  },
-  {
-    onClick: () => {},
-    icon: <MdOutlineDeleteOutline />,
-    text: "Clear Canvas",
-    shortCut: "?",
-  },
-  {
-    onClick: () => {},
-    icon: <SiExcalidraw />,
-    text: "Excalidraw",
-  },
-  {
-    onClick: () => {},
-    icon: <LuGithub />,
-    text: "Github",
-  },
-  {
-    onClick: () => {},
-    icon: <FaXTwitter />,
-    text: "Follow Me",
-  },
-  {
-    onClick: () => {},
-    icon: <MdOutlineLogout />,
-    text: "Sign up",
-  },
-];
-
-const SecondSideba = ({ onClick }: { onClick: () => void }) => {
+const SecondSideba = ({
+  onClick,
+  saveClick,
+}: {
+  onClick: () => void;
+  saveClick: () => void;
+}) => {
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
       console.log(e.key);
@@ -100,6 +43,69 @@ const SecondSideba = ({ onClick }: { onClick: () => void }) => {
       window.removeEventListener("keydown", fn);
     };
   }, []);
+
+  const SecondSidebarItems: SecondSidebarItems[] = [
+    {
+      onClick: () => {},
+      icon: <GoFileDirectory />,
+      text: "Open",
+    },
+    {
+      onClick: saveClick,
+      icon: <MdOutlineFileDownload />,
+      text: "Save",
+      shortCut: "Ctrl + Shift + E",
+    },
+    {
+      onClick: () => {},
+      icon: <FiUsers />,
+      text: "Collaboration",
+    },
+    {
+      onClick: () => {},
+      icon: <AiOutlineThunderbolt />,
+      text: "Comand Palette",
+      shortCut: "Ctrl + /",
+    },
+    {
+      onClick: () => {},
+      icon: <IoMdSearch />,
+      text: "Comand Palette",
+      shortCut: "Ctrl + F",
+    },
+    {
+      onClick: () => {},
+      icon: <MdOutlineHelpOutline />,
+      text: "Comand Palette",
+      shortCut: "?",
+    },
+    {
+      onClick: () => {},
+      icon: <MdOutlineDeleteOutline />,
+      text: "Clear Canvas",
+      shortCut: "?",
+    },
+    {
+      onClick: () => {},
+      icon: <SiExcalidraw />,
+      text: "Excalidraw",
+    },
+    {
+      onClick: () => {},
+      icon: <LuGithub />,
+      text: "Github",
+    },
+    {
+      onClick: () => {},
+      icon: <FaXTwitter />,
+      text: "Follow Me",
+    },
+    {
+      onClick: () => {},
+      icon: <MdOutlineLogout />,
+      text: "Sign up",
+    },
+  ];
 
   const { theme, toggleTheme } = useContext(ThemeContext);
 

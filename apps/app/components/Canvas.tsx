@@ -296,7 +296,7 @@ const Canvas = ({
       )}
 
       {popup === "second-sidebar" && (
-        <SecondSideba onClick={() => setPopup(null)} />
+        <SecondSideba onClick={() => setPopup(null)} saveClick={() => draw?.downloadImage( )} />
       )}
     </div>
   );

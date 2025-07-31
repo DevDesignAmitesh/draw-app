@@ -5,7 +5,6 @@ import Logo from "./Logo";
 import { LandingPageHeader } from "@/lib/ui/utils";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import HeaderDropDown from "./HeaderDropDown";
-import Button from "./Button";
 import TwoBtn from "./TwoBtn";
 import { ThemeContext } from "@/lib/ThemeProvider";
 
@@ -13,7 +12,7 @@ const Header = ({ userId }: { userId: string | null }) => {
   const { toggleTheme } = useContext(ThemeContext);
   return (
     <div className="w-full">
-      <header className="fixed bg-[#F8FFF8] dark:bg-[#121212] z-[50] top-0 right-0 left-0 w-full max-w-7xl mx-auto flex justify-between items-center lg:px-9 px-4 lg:py-7 py-4">
+      <header className="fixed bg-[#F8FFF8] dark:bg-[#121212] z-[50] top-0 right-0 left-0 w-full max-w-7xl mx-auto flex justify-between items-center lg:py-7 py-4">
         <div className="flex justify-center items-center gap-18">
           <Logo />
           <div className="lg:flex hidden relative justify-center capitalize text-[#030064] dark:text-white items-center gap-6 text-[16px]">
