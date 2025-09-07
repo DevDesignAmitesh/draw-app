@@ -12,7 +12,7 @@ export async function getAllRooms(): Promise<any[]> {
     const res = await fetch(`${HTTP_URL}/room`, {
       method: "GET",
       headers: {
-        Cookie: `token=${token}`,
+        Cookie: `${token}`,
       },
       cache: "no-store",
     });
@@ -29,12 +29,15 @@ export async function getAllRooms(): Promise<any[]> {
   }
 }
 
-// ✅ Get all shapes for a specific slug
-
-// ✅ Get user ID from backend
 export async function getUserId(): Promise<string | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
+
+  console.log("token inside the server http");
+  console.log(token);
+
+  console.log(HTTP_URL);
+  console.log("token inside the server http");
 
   if (!token) return null;
 
@@ -42,7 +45,7 @@ export async function getUserId(): Promise<string | null> {
     const res = await fetch(`${HTTP_URL}/who`, {
       method: "GET",
       headers: {
-        Cookie: `token=${token}`,
+        Cookie: `${token}`,
       },
       cache: "no-store",
     });

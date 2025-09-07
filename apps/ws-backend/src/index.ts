@@ -36,7 +36,7 @@ wss.on("connection", (ws: WebSocket, req: Request) => {
   }
 
   ws.on("message", async (e) => {
-    const parsedMessage = JSON.parse(e.toString());
+    const parsedMessage = await JSON.parse(e.toString());
     console.log(parsedMessage);
     if (parsedMessage.type === "join_room") {
       const { roomSlug, userId } = parsedMessage.payload;

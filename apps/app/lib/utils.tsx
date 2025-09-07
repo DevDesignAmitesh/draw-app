@@ -466,5 +466,6 @@ export interface FormDataTypes {
   type: selectedTools | null;
 }
 
+
 export const HTTP_URL = "http://localhost:5000/api/v1";
-export const WS_URL = "http://localhost:9000";
+export const WS_URL = "ws://localhost:9000";

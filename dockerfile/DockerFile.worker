@@ -1,0 +1,33 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY ./package.json ./pnpm-lock.yaml ./pnpm-workspace.yaml ./
+COPY ./apps/worker/package.json /apps/worker/
+COPY packages packages
+
+RUN npm install -g pnpm
+
+# Install Postgres client to use pg_isready
+RUN apk add --no-cache postgresql-client
+
+RUN pnpm install --filter "{packages/*}"
+
+RUN pnpm generate
+
+RUN pnpm --filter="./packages/*" build
+
+COPY . .
+
+RUN pnpm install --filter worker
+
+RUN pnpm build:worker
+
+# Copy entrypoint
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Use entrypoint
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+CMD [ "pnpm", "start:worker" ]

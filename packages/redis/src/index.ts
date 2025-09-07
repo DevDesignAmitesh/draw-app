@@ -18,7 +18,7 @@ export class Redis {
   public static async getCommandClient(): Promise<RedisClientType> {
     if (!Redis.commandClient) {
       // Redis.commandClient = createClient(redisCredentials);
-      Redis.commandClient = createClient();
+      Redis.commandClient = createClient({url: "redis://redis:6379"});
 
       Redis.commandClient.on("error", (err) => {
         console.error("Redis Error:", err);
@@ -33,7 +33,7 @@ export class Redis {
   public static async getSubscriberClient(): Promise<RedisClientType> {
     if (!Redis.subscriberClient) {
       // Redis.subscriberClient = createClient(redisCredentials);
-      Redis.subscriberClient = createClient();
+      Redis.subscriberClient = createClient({url: "redis://redis:6379"});
 
       Redis.subscriberClient.on("error", (err) => {
         console.error("Redis Error:", err);
